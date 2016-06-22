@@ -45,21 +45,23 @@ let prevResult = '';
 logUpdate(`${pre}${chalk.dim('Relevant emojis will appear when you start writing')}\n`);
 
 process.stdin.on('keypress', (ch, key) => {
-	if (!key) {
-		return;
-	}
+	key = key || {};
 
 	if (hasAnsi(key.sequence)) {
 		return;
 	}
 
-	if (key.name === 'backspace') {
+	if (key.name === 'escape') {
+		// `escape` is only triggered after 3 keypresses
+		// TODO: report it as it's probably a Node.js bug
+		process.exit();
+	} else if (key.name === 'backspace') {
 		query.pop();
 	} else if (key.name === 'return') {
 		query.length = 0;
 		readline.moveCursor(process.stdin, 0, -1);
-	} else if (key.sequence) {
-		query.push(key.sequence);
+	} else {
+		query.push(ch);
 	}
 
 	const queryStr = query.join('');
