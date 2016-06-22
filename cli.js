@@ -8,6 +8,10 @@ const debounce = require('lodash.debounce');
 const hasAnsi = require('has-ansi');
 const emoj = require('./');
 
+// limit it to 7 results to not overwhelm the user
+// and reduce the chance of showing unrelated emojis
+const fetch = str => emoj(str).then(arr => arr.slice(0, 7).join('  '));
+
 const cli = meow(`
 	Usage
 	  $ emoj [text]
@@ -20,12 +24,7 @@ const cli = meow(`
 `);
 
 if (cli.input.length > 0) {
-	emoj(cli.input[0]).then(emojis => {
-		// limit it to 7 results to not overwhelm the user
-		// and reduce the chance of showing unrelated emojis
-		console.log(emojis.slice(0, 7).join('  '));
-	});
-
+	fetch(cli.input[0]).then(console.log);
 	return;
 }
 
@@ -73,12 +72,12 @@ process.stdin.on('keypress', (ch, key) => {
 		return;
 	}
 
-	emoj(queryStr).then(debounce(emojis => {
+	fetch(queryStr).then(debounce(emojis => {
 		if (query.length <= 1) {
 			return;
 		}
 
-		const emojisStr = prevResult = emojis.slice(0, 7).join('  ');
-		logUpdate(`${pre}${chalk.bold(query.join(''))}\n${emojisStr}`);
+		prevResult = emojis;
+		logUpdate(`${pre}${chalk.bold(query.join(''))}\n${emojis}`);
 	}, 300));
 });
