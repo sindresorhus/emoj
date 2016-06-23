@@ -1,6 +1,6 @@
 # emoj [![Build Status](https://travis-ci.org/sindresorhus/emoj.svg?branch=master)](https://travis-ci.org/sindresorhus/emoj)
 
-> Find relevant emojis from text on the command-line
+> Find relevant emoji from text on the command-line
 
 <img src="screenshot.gif" width="660">
 
