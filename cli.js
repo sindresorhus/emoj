@@ -72,11 +72,11 @@ process.stdin.on('keypress', (ch, key) => {
 
 	const queryStr = query.join('');
 
-	logUpdate(`${pre}${chalk.bold(queryStr)}\n${prevResult}`);
+	logUpdate(`${pre}${chalk.bold(queryStr)}\n${prevResult}\n`);
 
 	if (query.length <= 1) {
 		prevResult = '';
-		logUpdate(`${pre}${chalk.bold(queryStr)}\n`);
+		logUpdate(`${pre}${chalk.bold(queryStr)}\n\n`);
 		return;
 	}
 
