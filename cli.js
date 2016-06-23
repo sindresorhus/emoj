@@ -55,7 +55,7 @@ process.stdin.on('keypress', (ch, key) => {
 
 	if (key.name === 'escape' || (key.ctrl && key.name === 'c')) {
 		if (query.length <= 1) {
-			logUpdate(`${pre}${chalk.dim('Hey! You were supposed to use me')}\n\n`);
+			logUpdate();
 			readline.moveCursor(process.stdout, 0, -1);
 		}
 
