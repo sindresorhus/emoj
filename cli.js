@@ -34,13 +34,12 @@ readline.emitKeypressEvents(process.stdin);
 process.stdin.setRawMode(true);
 
 const pre = `\n${chalk.bold.cyan('›')} `;
-const conn = `\n${chalk.bold.red('›')} `;
 const query = [];
 let prevResult = '';
 
 dns.lookup('emoji.getdango.com', err => {
 	if (err && err.code === 'ENOTFOUND') {
-		logUpdate(`${conn}${chalk.dim('Please check your internet connection')}\n`);
+		logUpdate(`\n${chalk.bold.red('› ')}${chalk.dim('Please check your internet connection')}\n`);
 		process.exit(1);
 	} else {
 		logUpdate(`${pre}${chalk.dim('Relevant emojis will appear when you start writing')}\n`);
