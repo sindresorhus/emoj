@@ -28,12 +28,7 @@ if (cli.input.length > 0) {
 	return;
 }
 
-const rl = readline.createInterface({
-	input: process.stdin,
-	output: process.stdout
-});
-
-readline.emitKeypressEvents(process.stdin, rl);
+readline.emitKeypressEvents(process.stdin);
 process.stdin.setRawMode(true);
 
 const pre = `\n${chalk.cyan('›')} `;
@@ -42,7 +37,7 @@ let prevResult = '';
 
 // TODO: so some heavy caching of the query using my `mem` module
 
-logUpdate(`${pre}${chalk.dim('Relevant emojis will appear when you start writing')}\n`);
+logUpdate(`${pre}${chalk.dim('Relevant emojis appear when you start writing')}\n`);
 
 process.stdin.on('keypress', (ch, key) => {
 	key = key || {};
@@ -51,15 +46,19 @@ process.stdin.on('keypress', (ch, key) => {
 		return;
 	}
 
-	if (key.name === 'escape') {
-		// `escape` is only triggered after 3 keypresses
-		// TODO: report it as it's probably a Node.js bug
+	if (key.name === 'escape' || (key.ctrl && key.name === 'c')) {
+		if (query.length <= 1) {
+			logUpdate();
+			readline.moveCursor(process.stdout, 0, -1);
+		}
+
 		process.exit();
-	} else if (key.name === 'backspace') {
+	}
+
+	if (key.name === 'backspace') {
 		query.pop();
-	} else if (key.name === 'return') {
+	} else if (key.name === 'return' || (key.ctrl && key.name === 'u')) {
 		query.length = 0;
-		readline.moveCursor(process.stdin, 0, -1);
 	} else {
 		query.push(ch);
 	}
