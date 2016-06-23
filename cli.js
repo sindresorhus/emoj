@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const dns = require('dns');
 const readline = require('readline');
 const meow = require('meow');
 const logUpdate = require('log-update');
@@ -32,11 +33,19 @@ if (cli.input.length > 0) {
 readline.emitKeypressEvents(process.stdin);
 process.stdin.setRawMode(true);
 
-const pre = `\n${chalk.cyan('›')} `;
+const pre = `\n${chalk.bold.cyan('›')} `;
+const conn = `\n${chalk.bold.red('›')} `;
 const query = [];
 let prevResult = '';
 
-logUpdate(`${pre}${chalk.dim('Relevant emojis appear when you start writing')}\n`);
+dns.lookup('emoji.getdango.com', err => {
+	if (err && err.code === 'ENOTFOUND') {
+		logUpdate(`${conn}${chalk.dim('Please check your internet connection')}\n`);
+		process.exit(1);
+	} else {
+		logUpdate(`${pre}${chalk.dim('Relevant emojis will appear when you start writing')}\n`);
+	}
+});
 
 process.stdin.on('keypress', (ch, key) => {
 	key = key || {};
@@ -47,7 +56,7 @@ process.stdin.on('keypress', (ch, key) => {
 
 	if (key.name === 'escape' || (key.ctrl && key.name === 'c')) {
 		if (query.length <= 1) {
-			logUpdate();
+			logUpdate(`${pre}${chalk.dim('Hey! You were supposed to use me')}\n\n`);
 			readline.moveCursor(process.stdout, 0, -1);
 		}
 
@@ -78,6 +87,6 @@ process.stdin.on('keypress', (ch, key) => {
 		}
 
 		prevResult = emojis;
-		logUpdate(`${pre}${chalk.bold(query.join(''))}\n${emojis}`);
+		logUpdate(`${pre}${chalk.bold(query.join(''))}\n${emojis}\n`);
 	}, 300));
 });
