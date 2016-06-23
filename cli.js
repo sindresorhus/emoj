@@ -6,11 +6,12 @@ const logUpdate = require('log-update');
 const chalk = require('chalk');
 const debounce = require('lodash.debounce');
 const hasAnsi = require('has-ansi');
+const mem = require('mem');
 const emoj = require('./');
 
-// limit it to 7 results to not overwhelm the user
-// and reduce the chance of showing unrelated emojis
-const fetch = str => emoj(str).then(arr => arr.slice(0, 7).join('  '));
+// limit it to 7 results so not to overwhelm the user
+// this also reduces the chance of showing unrelated emojis
+const fetch = mem(str => emoj(str).then(arr => arr.slice(0, 7).join('  ')));
 
 const cli = meow(`
 	Usage
@@ -34,8 +35,6 @@ process.stdin.setRawMode(true);
 const pre = `\n${chalk.cyan('›')} `;
 const query = [];
 let prevResult = '';
-
-// TODO: so some heavy caching of the query using my `mem` module
 
 logUpdate(`${pre}${chalk.dim('Relevant emojis appear when you start writing')}\n`);
 
