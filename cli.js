@@ -9,6 +9,7 @@ const debounce = require('lodash.debounce');
 const hasAnsi = require('has-ansi');
 const mem = require('mem');
 const emoj = require('./');
+const npc = require('copy-paste');
 
 // limit it to 7 results so not to overwhelm the user
 // this also reduces the chance of showing unrelated emojis
@@ -42,7 +43,7 @@ dns.lookup('emoji.getdango.com', err => {
 		logUpdate(`\n${chalk.bold.red('› ')}${chalk.dim('Please check your internet connection')}\n\n`);
 		process.exit(1);
 	} else {
-		logUpdate(`${pre}${chalk.dim('Relevant emojis will appear when you start writing')}\n\n`);
+		logUpdate(`${pre}${chalk.dim('Relevant emojis will appear when you start writing.\n\r  Hit enter to copy the emojis to your clipboard.')}\n\n`);
 	}
 });
 
@@ -64,7 +65,10 @@ process.stdin.on('keypress', (ch, key) => {
 
 	if (key.name === 'backspace') {
 		query.pop();
-	} else if (key.name === 'return' || (key.ctrl && key.name === 'u')) {
+	} else if (key.ctrl && key.name === 'u') {
+		query.length = 0;
+	} else if (key.name === 'return' && prevResult) {
+		npc.copy(prevResult);
 		query.length = 0;
 	} else {
 		query.push(ch);
