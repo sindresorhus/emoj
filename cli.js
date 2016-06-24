@@ -8,8 +8,8 @@ const chalk = require('chalk');
 const debounce = require('lodash.debounce');
 const hasAnsi = require('has-ansi');
 const mem = require('mem');
-const emoj = require('./');
 const npc = require('copy-paste');
+const emoj = require('./');
 
 // limit it to 7 results so not to overwhelm the user
 // this also reduces the chance of showing unrelated emojis
