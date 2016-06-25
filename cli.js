@@ -14,6 +14,8 @@ const emoj = require('./');
 // this also reduces the chance of showing unrelated emojis
 const fetch = mem(str => emoj(str).then(arr => arr.slice(0, 7).join('  ')));
 
+const debouncer = debounce(cb => cb(), 200);
+
 const cli = meow(`
 	Usage
 	  $ emoj [text]
@@ -80,12 +82,14 @@ process.stdin.on('keypress', (ch, key) => {
 		return;
 	}
 
-	fetch(queryStr).then(debounce(emojis => {
-		if (query.length <= 1) {
-			return;
-		}
+	debouncer(() => {
+		fetch(queryStr).then(emojis => {
+			if (query.length <= 1) {
+				return;
+			}
 
-		prevResult = emojis;
-		logUpdate(`${pre}${chalk.bold(query.join(''))}\n${emojis}\n`);
-	}, 300));
+			prevResult = emojis;
+			logUpdate(`${pre}${chalk.bold(query.join(''))}\n${emojis}\n`);
+		});
+	});
 });
