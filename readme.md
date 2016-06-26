@@ -35,6 +35,11 @@ $ emoj --help
 ```
 
 
+## Related
+
+- [alfred-emoj](https://github.com/sindresorhus/alfred-emoj) - Alfred plugin
+
+
 ## License
 
 MIT © [Sindre Sorhus](https://sindresorhus.com)
