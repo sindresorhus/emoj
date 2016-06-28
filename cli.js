@@ -8,6 +8,7 @@ const chalk = require('chalk');
 const debounce = require('lodash.debounce');
 const hasAnsi = require('has-ansi');
 const mem = require('mem');
+const npc = require('copy-paste');
 const emoj = require('./');
 
 // limit it to 7 results so not to overwhelm the user
@@ -44,7 +45,12 @@ dns.lookup('emoji.getdango.com', err => {
 		logUpdate(`\n${chalk.bold.red('› ')}${chalk.dim('Please check your internet connection')}\n\n`);
 		process.exit(1);
 	} else {
-		logUpdate(`${pre}${chalk.dim('Relevant emojis will appear when you start writing')}\n\n`);
+		let introText = '';
+		introText += `${pre}Relevant emojis will appear when you start writing.`;
+		introText += `${pre}You can copy an emoji by holding down the CTRL key and pressing a number from 1 - 7.`;
+		introText += `${pre}You can also copy all emoji's with CTRL + 0.`;
+
+		logUpdate(`${chalk.dim(introText)}\n\n`);
 	}
 });
 
@@ -66,7 +72,26 @@ process.stdin.on('keypress', (ch, key) => {
 
 	if (key.name === 'backspace') {
 		query.pop();
-	} else if (key.name === 'return' || (key.ctrl && key.name === 'u')) {
+	} else if (key.ctrl && key.name === 'u') {
+		query.length = 0;
+	} else if (key.ctrl && key.name === '0') {
+		npc.copy(prevResult);
+	} else if (key.ctrl && key.name === '1') {
+		npc.copy(prevResult[0]);
+	} else if (key.ctrl && key.name === '2') {
+		npc.copy(prevResult[1]);
+	} else if (key.ctrl && key.name === '3') {
+		npc.copy(prevResult[2]);
+	} else if (key.ctrl && key.name === '4') {
+		npc.copy(prevResult[3]);
+	} else if (key.ctrl && key.name === '5') {
+		npc.copy(prevResult[4]);
+	} else if (key.ctrl && key.name === '6') {
+		npc.copy(prevResult[5]);
+	} else if (key.ctrl && key.name === '7') {
+		npc.copy(prevResult[6]);
+	} else if (key.name === 'return') {
+		npc.copy(prevResult);
 		query.length = 0;
 	} else {
 		query.push(ch);
