@@ -3,7 +3,6 @@
 
 const dns = require('dns');
 const readline = require('readline');
-const os = require('os');
 const process = require('process');
 const meow = require('meow');
 const logUpdate = require('log-update');
@@ -11,13 +10,14 @@ const chalk = require('chalk');
 const debounce = require('lodash.debounce');
 const hasAnsi = require('has-ansi');
 const mem = require('mem');
+const ncp = require('copy-paste');
 const emoj = require('./');
 
 // limit it to 7 results so not to overwhelm the user.  this also reduces the
-// chance of showing unrelated emojis. If we're piping to another process, just
-// give 1. This makes `emoj | pbcopy` easier.
+// chance of showing unrelated emojis.
 
 let numEmojis = process.stdout.isTTY ? 7 : 1;
+let action = (r => console.log(r));
 
 const fetch = mem(str => emoj(str).then(arr => arr.slice(0, numEmojis).join('  ')));
 
@@ -25,10 +25,11 @@ const debouncer = debounce(cb => cb(), 200);
 
 const cli = meow(`
 	Usage
-	  $ emoj [text]
+	  $ emoj [text] [-c] [-n number]
 
   Options
     -n, --number Number of Emojis to return (maximum 10)
+		-c, --copy	 Copy emojis to clipboard as well as writing to stdout
 
 	Example
 	  $ emoj 'i love unicorns'
@@ -37,17 +38,22 @@ const cli = meow(`
 	Run it without arguments to enter the live search
 `, {
 	alias: {
-		n: 'number'
+		n: 'number',
+		c: 'copy'
 	}
 });
+
+if ('copy' in cli.flags) {
+	numEmojis = 1;
+	action = (r => Promise.all([console.log(r), ncp.copy(r)]));
+}
 
 if ('number' in cli.flags) {
 	numEmojis = cli.flags.number > 10 ? 10 : cli.flags.number;
 }
 
 if (cli.input.length > 0) {
-	let term = process.stdout.isTTY ? os.EOL : '';
-	fetch(cli.input[0]).then(r => process.stdout.write(r + term));
+	fetch(cli.input[0]).then(action);
 	return;
 }
 
