@@ -27,6 +27,9 @@ $ emoj --help
   Usage
     $ emoj [text]
 
+  Options
+    -n, --number Number of Emojis to return (maximum 10)
+
   Example
     $ emoj 'i love unicorns'
     🦄  🎠  🐴  🐎  ❤  ✨  🌈
