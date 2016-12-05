@@ -8,11 +8,12 @@ const chalk = require('chalk');
 const debounce = require('lodash.debounce');
 const hasAnsi = require('has-ansi');
 const mem = require('mem');
+const clipboardy = require('clipboardy');
 const emoj = require('./');
 
 // limit it to 7 results so not to overwhelm the user
 // this also reduces the chance of showing unrelated emojis
-const fetch = mem(str => emoj(str).then(arr => arr.slice(0, 7).join('  ')));
+const fetch = mem(str => emoj(str).then(arr => arr.slice(0, 7)));
 
 const debouncer = debounce(cb => cb(), 200);
 
@@ -24,11 +25,24 @@ const cli = meow(`
 	  $ emoj 'i love unicorns'
 	  🦄  🎠  🐴  🐎  ❤  ✨  🌈
 
+	Options
+	  --copy -c  Copy the first emoji to the clipboard
+
 	Run it without arguments to enter the live search
-`);
+`, {
+	boolean: [
+		'copy'
+	],
+	alias: {
+		c: 'copy'
+	}
+});
 
 if (cli.input.length > 0) {
-	fetch(cli.input[0]).then(console.log);
+	fetch(cli.input[0]).then(val => {
+		console.log(val.join('  '));
+		clipboardy.writeSync(val[0]);
+	});
 	return;
 }
 
@@ -88,7 +102,7 @@ process.stdin.on('keypress', (ch, key) => {
 				return;
 			}
 
-			prevResult = emojis;
+			prevResult = emojis = emojis.join('  ');
 			logUpdate(`${pre}${chalk.bold(query.join(''))}\n${emojis}\n`);
 		});
 	});

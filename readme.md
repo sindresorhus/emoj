@@ -31,6 +31,9 @@ $ emoj --help
     $ emoj 'i love unicorns'
     🦄  🎠  🐴  🐎  ❤  ✨  🌈
 
+  Options
+    --copy -c  Copy the first emoji to the clipboard
+
   Run it without arguments to enter the live search
 ```
 
