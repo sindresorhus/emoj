@@ -11,8 +11,8 @@ const mem = require('mem');
 const clipboardy = require('clipboardy');
 const emoj = require('./');
 
-// limit it to 7 results so not to overwhelm the user
-// this also reduces the chance of showing unrelated emojis
+// Limit it to 7 results so not to overwhelm the user
+// This also reduces the chance of showing unrelated emojis
 const fetch = mem(str => emoj(str).then(arr => arr.slice(0, 7)));
 
 const debouncer = debounce(cb => cb(), 200);
