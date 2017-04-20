@@ -19,14 +19,15 @@ const debouncer = debounce(cb => cb(), 200);
 
 const cli = meow(`
 	Usage
-	  $ emoj [text]
+	  $ emoj [OPTIONS] [text]
 
 	Example
 	  $ emoj 'i love unicorns'
 	  🦄  🎠  🐴  🐎  ❤  ✨  🌈
 
 	Options
-	  --copy -c  Copy the first emoji to the clipboard
+	  --copy -c [choice]  Copy the emoji on index <choice> to the clipboard
+	                      <choice> defaults to 1.
 
 	Run it without arguments to enter the live search
 `, {
