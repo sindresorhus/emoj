@@ -11,6 +11,30 @@ const mem = require('mem');
 const clipboardy = require('clipboardy');
 const emoj = require('./');
 
+/**
+ * clampIndex - Return index between min and max, one-indexed.
+ *
+ * @param {string} index Index to clamp.
+ * @param {number} min   Minimum value to clamp.
+ * @param {number} max   Maximum value to clamp.
+ * @return {number} Index between min and max.
+ */
+function clampIndex(index, min, max) {
+  const copyIndex = parseInt(index);
+
+  if (isNaN(copyIndex) || copyIndex < min + 1) {
+    // return minimum if index is no number or below minimum
+    return min;
+  }
+  else if (copyIndex > max) {
+    // return maximum if index is above maximum
+    return max;
+  }
+
+  // return index one-indexed
+  return copyIndex - 1;
+}
+
 // Limit it to 7 results so not to overwhelm the user
 // This also reduces the chance of showing unrelated emojis
 const fetch = mem(str => emoj(str).then(arr => arr.slice(0, 7)));
@@ -31,7 +55,7 @@ const cli = meow(`
 
 	Run it without arguments to enter the live search
 `, {
-	boolean: [
+	string: [
 		'copy'
 	],
 	alias: {
@@ -39,12 +63,39 @@ const cli = meow(`
 	}
 });
 
+const shouldCopy = cli.flags.hasOwnProperty('copy');
+
+// move `--copy` argument to input, if it's no index (NaN)
+if (shouldCopy && cli.input.length === 0 && isNaN(cli.flags.copy)) {
+  cli.input = [cli.flags.copy];
+  cli.flags = {};
+}
+
 if (cli.input.length > 0) {
-	fetch(cli.input[0]).then(val => {
-		console.log(val.join('  '));
-		clipboardy.writeSync(val[0]);
-	});
-	return;
+  fetch(cli.input[0]).then(choices => {
+    // if `--copy` is set, use the (optional) index to copy into
+    // clipboard
+    const index = clampIndex(cli.flags.copy, 0, choices.length - 1);
+    const selection = choices[index];
+
+    // copy selection to clipboard
+    clipboardy.writeSync(selection);
+
+    // highlight selection
+    const pre = chalk.bold.cyan('›');
+    const elements = choices.map((item, mapIndex) => {
+      if (mapIndex === index) {
+        return chalk.cyan(item);
+      }
+
+      return item;
+    });
+
+    // return highlighted selection
+    console.log(`${pre} ${elements.join('  ')}`);
+  });
+
+  return;
 }
 
 readline.emitKeypressEvents(process.stdin);
