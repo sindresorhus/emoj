@@ -85,6 +85,7 @@ if (cli.input.length > 0) {
 			// highlight selection
 			const pre = chalk.bold.cyan('›');
 			const elements = choices.map((item, mapIndex) => {
+				// highlight selection for non-color emoji terminals
 				if (mapIndex === index) {
 					return chalk.cyan(item);
 				}
@@ -93,7 +94,7 @@ if (cli.input.length > 0) {
 			});
 
 			// return highlighted selection
-			console.log(`${pre} ${elements.join('  ')}`);
+			console.log(`${pre} ${elements.join('  ')} : ${selection}`);
 		} else {
 			// if not explicitly set, inquire the index of the emoji to copy
 			// to clipboard
