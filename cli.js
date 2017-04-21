@@ -10,7 +10,6 @@ const hasAnsi = require('has-ansi');
 const mem = require('mem');
 const clipboardy = require('clipboardy');
 const inquirer = require('inquirer');
-
 const emoj = require('./');
 
 /**
