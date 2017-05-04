@@ -29,21 +29,29 @@ const cli = meow(`
 
 	Options
 	  --copy -c  Copy the first emoji to the clipboard
+	  --skin-tone -s  Set the skin tone of the emojis
 
 	Run it without arguments to enter the live search
 	Use Up/Down keys during live search to change the skin tones
 `, {
 	boolean: [
-		'copy'
+		'copy',
+		'skinTone'
 	],
 	alias: {
-		c: 'copy'
+		c: 'copy',
+		s: 'skinTone'
 	}
 });
 
+let skinNumber = 0;
+if(cli.flags.skinTone){
+	skinNumber = cli.flags.skinTone;
+}
+
 if (cli.input.length > 0) {
 	fetch(cli.input[0]).then(val => {
-		console.log(val.join('  '));
+		console.log(val.map( x => skinTone(x, skinNumber)).join('  '));
 		clipboardy.writeSync(val[0]);
 	});
 	return;
@@ -55,7 +63,6 @@ process.stdin.setRawMode(true);
 const pre = `\n${chalk.bold.cyan('›')} `;
 const query = [];
 let prevResult = '';
-let skinNumber = 0;
 
 dns.lookup('emoji.getdango.com', err => {
 	if (err && err.code === 'ENOTFOUND') {
