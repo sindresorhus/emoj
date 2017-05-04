@@ -10,6 +10,8 @@ const hasAnsi = require('has-ansi');
 const mem = require('mem');
 const clipboardy = require('clipboardy');
 const emoj = require('./');
+const skinTone = require('skin-tone');
+
 
 // Limit it to 7 results so not to overwhelm the user
 // This also reduces the chance of showing unrelated emojis
@@ -29,6 +31,7 @@ const cli = meow(`
 	  --copy -c  Copy the first emoji to the clipboard
 
 	Run it without arguments to enter the live search
+	Use Up/Down keys during live search to change the skin tones
 `, {
 	boolean: [
 		'copy'
@@ -52,6 +55,7 @@ process.stdin.setRawMode(true);
 const pre = `\n${chalk.bold.cyan('›')} `;
 const query = [];
 let prevResult = '';
+let skinNumber = 0;
 
 dns.lookup('emoji.getdango.com', err => {
 	if (err && err.code === 'ENOTFOUND') {
@@ -65,7 +69,8 @@ dns.lookup('emoji.getdango.com', err => {
 process.stdin.on('keypress', (ch, key) => {
 	key = key || {};
 
-	if (hasAnsi(key.sequence)) {
+	// Filter out all Ansi sequences except the Up/Down keys which change the skin tone
+	if (hasAnsi(key.sequence) && key.name !== 'up' && key.name !== 'down') {
 		return;
 	}
 
@@ -82,7 +87,12 @@ process.stdin.on('keypress', (ch, key) => {
 		query.pop();
 	} else if (key.name === 'return' || (key.ctrl && key.name === 'u')) {
 		query.length = 0;
-	} else {
+	} else if (key.name === 'up' && skinNumber < 5) {
+		skinNumber++;
+	} else if(key.name === 'down' && skinNumber > 0) {
+		skinNumber--;
+	}
+	else {
 		query.push(ch);
 	}
 
@@ -102,7 +112,7 @@ process.stdin.on('keypress', (ch, key) => {
 				return;
 			}
 
-			prevResult = emojis = emojis.join('  ');
+			prevResult = emojis = emojis.map(x => skinTone(x, skinNumber)).join('  ');
 			logUpdate(`${pre}${chalk.bold(query.join(''))}\n${emojis}\n`);
 		});
 	});

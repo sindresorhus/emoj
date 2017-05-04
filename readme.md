@@ -35,6 +35,7 @@ $ emoj --help
     --copy -c  Copy the first emoji to the clipboard
 
   Run it without arguments to enter the live search
+  Use Up/Down keys during live search to change the skin tones
 ```
 
 
