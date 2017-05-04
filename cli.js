@@ -9,8 +9,8 @@ const debounce = require('lodash.debounce');
 const hasAnsi = require('has-ansi');
 const mem = require('mem');
 const clipboardy = require('clipboardy');
-const emoj = require('./');
 const skinTone = require('skin-tone');
+const emoj = require('./');
 
 
 // Limit it to 7 results so not to overwhelm the user
@@ -45,13 +45,14 @@ const cli = meow(`
 });
 
 let skinNumber = 0;
-if(cli.flags.skinTone){
+if (cli.flags.skinTone) {
 	skinNumber = cli.flags.skinTone;
 }
 
 if (cli.input.length > 0) {
 	fetch(cli.input[0]).then(val => {
-		console.log(val.map( x => skinTone(x, skinNumber)).join('  '));
+		val = val.map(x => skinTone(x, skinNumber));
+		console.log(val.join('  '));
 		clipboardy.writeSync(val[0]);
 	});
 	return;
@@ -96,10 +97,9 @@ process.stdin.on('keypress', (ch, key) => {
 		query.length = 0;
 	} else if (key.name === 'up' && skinNumber < 5) {
 		skinNumber++;
-	} else if(key.name === 'down' && skinNumber > 0) {
+	} else if (key.name === 'down' && skinNumber > 0) {
 		skinNumber--;
-	}
-	else {
+	} else {
 		query.push(ch);
 	}
 
