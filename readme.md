@@ -33,7 +33,7 @@ $ emoj --help
 
   Options
     --copy -c  Copy the first emoji to the clipboard
-    --skin-tone -s  Set the skin tone of the emojis
+    --skin-tone -s  Set the skin tone of the emojis (0 to 5)
 
   Run it without arguments to enter the live search
   Use Up/Down keys during live search to change the skin tones

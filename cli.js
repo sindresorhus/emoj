@@ -29,7 +29,7 @@ const cli = meow(`
 
 	Options
 	  --copy -c  Copy the first emoji to the clipboard
-	  --skin-tone -s  Set the skin tone of the emojis
+	  --skin-tone -s  Set the skin tone of the emojis (0 to 5)
 
 	Run it without arguments to enter the live search
 	Use Up/Down keys during live search to change the skin tones
@@ -46,7 +46,12 @@ const cli = meow(`
 
 let skinNumber = 0;
 if (cli.flags.skinTone) {
-	skinNumber = cli.flags.skinTone;
+	if (cli.flags.skinTone >= 0 && cli.flags.skinTone <= 5) {
+		skinNumber = cli.flags.skinTone;
+	} else {
+		console.log('Skin tone must be a number between 0 and 5.');
+		return;
+	}
 }
 
 if (cli.input.length > 0) {
