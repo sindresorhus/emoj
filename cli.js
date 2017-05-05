@@ -10,6 +10,7 @@ const hasAnsi = require('has-ansi');
 const mem = require('mem');
 const clipboardy = require('clipboardy');
 const skinTone = require('skin-tone');
+const Conf = require('conf');
 const emoj = require('./');
 
 
@@ -18,6 +19,12 @@ const emoj = require('./');
 const fetch = mem(str => emoj(str).then(arr => arr.slice(0, 7)));
 
 const debouncer = debounce(cb => cb(), 200);
+
+const config = new Conf({
+	defaults: {
+		skinNumber: 0
+	}
+});
 
 const cli = meow(`
 	Usage
@@ -29,14 +36,13 @@ const cli = meow(`
 
 	Options
 	  --copy -c  Copy the first emoji to the clipboard
-	  --skin-tone -s  Set the skin tone of the emojis (0 to 5)
+	  --skin-tone -s  Set the default skin tone of the emoji (0 to 5)
 
 	Run it without arguments to enter the live search
 	Use Up/Down keys during live search to change the skin tones
 `, {
 	boolean: [
-		'copy',
-		'skinTone'
+		'copy'
 	],
 	alias: {
 		c: 'copy',
@@ -44,15 +50,16 @@ const cli = meow(`
 	}
 });
 
-let skinNumber = 0;
-if (cli.flags.skinTone) {
-	if (cli.flags.skinTone >= 0 && cli.flags.skinTone <= 5) {
-		skinNumber = cli.flags.skinTone;
+if (typeof cli.flags.skinTone === 'number') {
+	if (cli.flags.skinTone <= 5) {
+		config.set('skinNumber', cli.flags.skinTone);
 	} else {
 		console.log('Skin tone must be a number between 0 and 5.');
 		return;
 	}
 }
+
+let skinNumber = config.get('skinNumber');
 
 if (cli.input.length > 0) {
 	fetch(cli.input[0]).then(val => {
