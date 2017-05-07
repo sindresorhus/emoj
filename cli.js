@@ -13,7 +13,6 @@ const skinTone = require('skin-tone');
 const Conf = require('conf');
 const emoj = require('./');
 
-
 // Limit it to 7 results so not to overwhelm the user
 // This also reduces the chance of showing unrelated emojis
 const fetch = mem(str => emoj(str).then(arr => arr.slice(0, 7)));
@@ -51,12 +50,7 @@ const cli = meow(`
 });
 
 if (typeof cli.flags.skinTone === 'number') {
-	if (cli.flags.skinTone <= 5) {
-		config.set('skinNumber', cli.flags.skinTone);
-	} else {
-		console.log('Skin tone must be a number between 0 and 5.');
-		return;
-	}
+	config.set('skinNumber', Math.max(0, Math.min(5, cli.flags.skinTone)));
 }
 
 let skinNumber = config.get('skinNumber');
