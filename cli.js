@@ -11,7 +11,7 @@ const mem = require('mem');
 const clipboardy = require('clipboardy');
 const skinTone = require('skin-tone');
 const Conf = require('conf');
-const emoj = require('./');
+const emoj = require('.');
 
 // Limit it to 7 results so not to overwhelm the user
 // This also reduces the chance of showing unrelated emojis
@@ -34,8 +34,8 @@ const cli = meow(`
 	  🦄  🎠  🐴  🐎  ❤  ✨  🌈
 
 	Options
-	  --copy -c		Copy the first emoji to the clipboard
-	  --skin-tone -s	Set and persist the default emoji skin tone (0 to 5)
+	  --copy -c       Copy the first emoji to the clipboard
+	  --skin-tone -s  Set and persist the default emoji skin tone (0 to 5)
 
 	Run it without arguments to enter the live search
 	Use the up/down keys during live search to change the skin tone
@@ -58,11 +58,14 @@ let skinNumber = config.get('skinNumber');
 if (cli.input.length > 0) {
 	fetch(cli.input[0]).then(val => {
 		val = val.map(x => skinTone(x, skinNumber));
+
 		console.log(val.join('  '));
+
 		if (cli.flags.copy) {
 			clipboardy.writeSync(val[0]);
 		}
 	});
+
 	return;
 }
 
@@ -85,7 +88,7 @@ dns.lookup('emoji.getdango.com', err => {
 process.stdin.on('keypress', (ch, key) => {
 	key = key || {};
 
-	// Filter out all Ansi sequences except the Up/Down keys which change the skin tone
+	// Filter out all ansi sequences except the up/down keys which change the skin tone
 	if (hasAnsi(key.sequence) && ((key.name !== 'up' && key.name !== 'down') || query.length <= 1)) {
 		return;
 	}
