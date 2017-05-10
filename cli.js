@@ -49,7 +49,7 @@ const cli = meow(`
 	}
 });
 
-if (cli.flags.skinTone !== null) {
+if (cli.flags.skinTone !== undefined) {
 	config.set('skinNumber', Math.max(0, Math.min(5, Number(cli.flags.skinTone) || 0)));
 }
 
