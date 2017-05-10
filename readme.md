@@ -32,9 +32,11 @@ $ emoj --help
     🦄  🎠  🐴  🐎  ❤  ✨  🌈
 
   Options
-    --copy -c  Copy the first emoji to the clipboard
+    --copy -c   Copy the first emoji to the clipboard
+    --skin-tone -s  Set and persist the default emoji skin tone (0 to 5)
 
   Run it without arguments to enter the live search
+  Use the up/down keys during live search to change the skin tone
 ```
 
 
