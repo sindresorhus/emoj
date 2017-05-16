@@ -12,6 +12,27 @@ const clipboardy = require('clipboardy');
 const emoj = require('./');
 
 /**
+ * isArrowKey - Return, whether given key is an arrow key.
+ *
+ * @param {object} key Key object to check.
+ * @return {boolean} True, if key object is an arrow key, false
+ *                   otherwise.
+ */
+function isArrowKey(key) {
+	return key.name === 'up' || key.name === 'down' || key.name === 'left' || key.name === 'right';
+}
+
+/**
+ * stringifyEmojis - Pad list of emojis into a string.
+ *
+ * @param {Array} emojis Array of emojis.
+ * @return {string} Stringified and padded emoji-list.
+ */
+function stringifyEmojis(emojis) {
+	return emojis.join('  ');
+}
+
+/**
  * clampIndex - Return index between min and max, one-indexed.
  *
  * @param {string} index Index to clamp.
@@ -106,7 +127,8 @@ readline.emitKeypressEvents(process.stdin);
 process.stdin.setRawMode(true);
 
 const query = [];
-let prevResult = '';
+let emojiIndex = 0;
+let prevResult = [];
 
 dns.lookup('emoji.getdango.com', err => {
 	if (err && err.code === 'ENOTFOUND') {
@@ -120,7 +142,7 @@ dns.lookup('emoji.getdango.com', err => {
 process.stdin.on('keypress', (ch, key) => {
 	key = key || {};
 
-	if (hasAnsi(key.sequence)) {
+	if (hasAnsi(key.sequence) && (!isArrowKey(key) || query.length <= 1)) {
 		return;
 	}
 
@@ -135,18 +157,37 @@ process.stdin.on('keypress', (ch, key) => {
 
 	if (key.name === 'backspace') {
 		query.pop();
-	} else if (key.name === 'return' || (key.ctrl && key.name === 'u')) {
+	} else if (key.name === 'return') {
+		// only if there is a result return it
+		if (query.length > 0 && prevResult.length > 0) {
+			// get selection
+			const selection = prevResult[emojiIndex];
+
+			// print and copy selection to clipboard
+			logUpdate(`${pre}${stringifyEmojis(prevResult)} : ${selection}\n`);
+			clipboardy.writeSync(selection);
+
+			// exit program
+			process.exit();
+		}
+	} else if (key.ctrl && key.name === 'u') {
 		query.length = 0;
+	} else if (key.name === 'left') {
+		// decrease selected index
+		emojiIndex = Math.max(0, emojiIndex - 1);
+	} else if (key.name === 'right') {
+		// increase selected index
+		emojiIndex++;
 	} else {
 		query.push(ch);
 	}
 
 	const queryStr = query.join('');
 
-	logUpdate(`${pre}${chalk.bold(queryStr)}\n${prevResult}\n`);
+	logUpdate(`${pre}${chalk.bold(queryStr)}\n${stringifyEmojis(prevResult)}\n`);
 
 	if (query.length <= 1) {
-		prevResult = '';
+		prevResult = [];
 		logUpdate(`${pre}${chalk.bold(queryStr)}\n\n`);
 		return;
 	}
@@ -157,8 +198,11 @@ process.stdin.on('keypress', (ch, key) => {
 				return;
 			}
 
-			prevResult = emojis = emojis.join('  ');
-			logUpdate(`${pre}${chalk.bold(query.join(''))}\n${emojis}\n`);
+			// check and update upper bounds of emoji index
+			emojiIndex = Math.min(emojiIndex, emojis.length - 1);
+			prevResult = emojis;
+			const indicator = '   '.repeat(emojiIndex);
+			logUpdate(`${pre}${chalk.bold(query.join(''))}\n${stringifyEmojis(prevResult)}\n${indicator}Ʌ`);
 		});
 	});
 });
