@@ -9,7 +9,6 @@ const debounce = require('lodash.debounce');
 const hasAnsi = require('has-ansi');
 const mem = require('mem');
 const clipboardy = require('clipboardy');
-const inquirer = require('inquirer');
 const emoj = require('./');
 
 /**
@@ -63,6 +62,7 @@ const cli = meow(`
 	}
 });
 
+const pre = `\n${chalk.bold.cyan('›')} `;
 const shouldCopy = Object.prototype.hasOwnProperty.call(cli.flags, 'copy');
 
 // move `--copy` argument to input, if it's no index (NaN)
@@ -73,46 +73,30 @@ if (shouldCopy && cli.input.length === 0 && isNaN(cli.flags.copy)) {
 
 if (cli.input.length > 0) {
 	fetch(cli.input[0]).then(choices => {
-		if (shouldCopy) {
-			// if `--copy` is set, use the (optional) index to copy into
-			// clipboard
-			const index = clampIndex(cli.flags.copy, 0, choices.length - 1);
-			const selection = choices[index];
+		// if `--copy` is set, use the (optional) index to copy into
+		// clipboard
+		const index = shouldCopy ? clampIndex(cli.flags.copy, 0, choices.length - 1) : 0;
 
+		const selection = choices[index];
+
+		if (shouldCopy) {
 			// copy selection to clipboard
 			clipboardy.writeSync(selection);
-
-			// highlight selection
-			const pre = chalk.bold.cyan('›');
-			const elements = choices.map((item, mapIndex) => {
-				// highlight selection for non-color emoji terminals
-				if (mapIndex === index) {
-					return chalk.cyan(item);
-				}
-
-				return item;
-			});
-
-			// return highlighted selection
-			console.log(`${pre} ${elements.join('  ')} : ${selection}`);
-		} else {
-			// if not explicitly set, inquire the index of the emoji to copy
-			// to clipboard
-			inquirer
-				.prompt([
-					{
-						type: 'list',
-						message: 'Select emoji from this list:',
-						name: 'selection',
-						choices: choices
-					}
-				])
-				.then(answers => {
-					// copy selection to clipboard
-					// (selection is automatically printed by `inquirer`)
-					clipboardy.writeSync(answers.selection);
-				});
 		}
+
+		// highlight selection
+		const elements = choices.map((item, mapIndex) => {
+			// highlight selection for non-color emoji terminals
+			if (mapIndex === index) {
+				return chalk.cyan(item);
+			}
+
+			return item;
+		});
+
+		// return highlighted selection
+		const suffix = shouldCopy ? ` : ${selection}` : '';
+		logUpdate(`${pre} ${elements.join('  ')}${suffix}\n`);
 	});
 
 	return;
@@ -121,7 +105,6 @@ if (cli.input.length > 0) {
 readline.emitKeypressEvents(process.stdin);
 process.stdin.setRawMode(true);
 
-const pre = `\n${chalk.bold.cyan('›')} `;
 const query = [];
 let prevResult = '';
 
