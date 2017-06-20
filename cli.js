@@ -57,7 +57,8 @@ function clampIndex(index, min, max) {
 
 // Limit it to 7 results so not to overwhelm the user
 // This also reduces the chance of showing unrelated emojis
-const fetch = mem(str => emoj(str).then(arr => arr.slice(0, 7)));
+const emojiLimit = 7;
+const fetch = mem(str => emoj(str).then(arr => arr.slice(0, emojiLimit)));
 
 const debouncer = debounce(cb => cb(), 200);
 
@@ -177,14 +178,16 @@ process.stdin.on('keypress', (ch, key) => {
 		emojiIndex = Math.max(0, emojiIndex - 1);
 	} else if (key.name === 'right') {
 		// increase selected index
-		emojiIndex++;
+		emojiIndex = Math.min(emojiIndex + 1, emojiLimit - 1);
 	} else {
 		query.push(ch);
 	}
 
 	const queryStr = query.join('');
+	let indicator = prevResult.length <= 0 ? '' : `${'   '.repeat(emojiIndex)}^`;
 
-	logUpdate(`${pre}${chalk.bold(queryStr)}\n${stringifyEmojis(prevResult)}\n`);
+	// display emojis and indicator
+	logUpdate(`${pre}${chalk.bold(queryStr)}\n${stringifyEmojis(prevResult)}\n${indicator}`);
 
 	if (query.length <= 1) {
 		prevResult = [];
@@ -199,10 +202,11 @@ process.stdin.on('keypress', (ch, key) => {
 			}
 
 			// check and update upper bounds of emoji index
-			emojiIndex = Math.min(emojiIndex, emojis.length - 1);
 			prevResult = emojis;
-			const indicator = '   '.repeat(emojiIndex);
-			logUpdate(`${pre}${chalk.bold(query.join(''))}\n${stringifyEmojis(prevResult)}\n${indicator}Ʌ`);
+			indicator = prevResult.length <= 0 ? '' : `${'   '.repeat(emojiIndex)}^`;
+
+			// update emojis and indicator for new emoji
+			logUpdate(`${pre}${chalk.bold(queryStr)}\n${stringifyEmojis(prevResult)}\n${indicator}`);
 		});
 	});
 });
