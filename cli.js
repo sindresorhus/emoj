@@ -11,16 +11,6 @@ const emoj = require('.');
 
 const ui = importJsx('./ui');
 
-// Limit it to 7 results so not to overwhelm the user
-// This also reduces the chance of showing unrelated emojis
-const fetch = str => emoj(str).then(arr => arr.slice(0, 7));
-
-const config = new Conf({
-	defaults: {
-		skinNumber: 0
-	}
-});
-
 const cli = meow(`
 	Usage
 	  $ emoj [text]
@@ -43,6 +33,12 @@ const cli = meow(`
 	alias: {
 		c: 'copy',
 		s: 'skinTone'
+	}
+});
+
+const config = new Conf({
+	defaults: {
+		skinNumber: 0
 	}
 });
 
@@ -78,8 +74,10 @@ const main = () => {
 };
 
 if (cli.input.length > 0) {
-	fetch(cli.input[0]).then(emojis => {
-		emojis = emojis.map(emoji => skinTone(emoji, skinNumber));
+	emoj(cli.input[0]).then(emojis => {
+		emojis = emojis
+			.slice(0, 7)
+			.map(emoji => skinTone(emoji, skinNumber));
 
 		console.log(emojis.join('  '));
 
