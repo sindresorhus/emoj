@@ -4,7 +4,6 @@ const readline = require('readline');
 const meow = require('meow');
 const importJsx = require('import-jsx');
 const {h, mount} = require('ink');
-const mem = require('mem');
 const clipboardy = require('clipboardy');
 const skinTone = require('skin-tone');
 const Conf = require('conf');
@@ -14,7 +13,7 @@ const ui = importJsx('./ui');
 
 // Limit it to 7 results so not to overwhelm the user
 // This also reduces the chance of showing unrelated emojis
-const fetch = mem(str => emoj(str).then(arr => arr.slice(0, 7)));
+const fetch = str => emoj(str).then(arr => arr.slice(0, 7));
 
 const config = new Conf({
 	defaults: {
