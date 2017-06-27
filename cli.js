@@ -4,19 +4,17 @@ const readline = require('readline');
 const meow = require('meow');
 const importJsx = require('import-jsx');
 const {h, mount} = require('ink');
-const debounce = require('lodash.debounce');
 const mem = require('mem');
 const clipboardy = require('clipboardy');
 const skinTone = require('skin-tone');
 const Conf = require('conf');
 const emoj = require('.');
+
 const ui = importJsx('./ui');
 
 // Limit it to 7 results so not to overwhelm the user
 // This also reduces the chance of showing unrelated emojis
 const fetch = mem(str => emoj(str).then(arr => arr.slice(0, 7)));
-
-const debouncer = debounce(cb => cb(), 200);
 
 const config = new Conf({
 	defaults: {
@@ -53,7 +51,32 @@ if (cli.flags.skinTone !== undefined) {
 	config.set('skinNumber', Math.max(0, Math.min(5, Number(cli.flags.skinTone) || 0)));
 }
 
-let skinNumber = config.get('skinNumber');
+const skinNumber = config.get('skinNumber');
+
+const main = () => {
+	readline.emitKeypressEvents(process.stdin);
+	process.stdin.setRawMode(true);
+
+	const onSelectEmoji = emoji => {
+		clipboardy.writeSync(emoji);
+		process.exit();
+	};
+
+	let unmount; // eslint-disable-line prefer-const
+
+	const onError = () => {
+		unmount();
+		process.exit(1);
+	};
+
+	const onExit = () => {
+		unmount();
+		process.exit();
+	};
+
+	// Use `h` instead of JSX to avoid transpiling this file
+	unmount = mount(h(ui, {skinNumber, onSelectEmoji, onError, onExit}));
+};
 
 if (cli.input.length > 0) {
 	fetch(cli.input[0]).then(emojis => {
@@ -65,27 +88,6 @@ if (cli.input.length > 0) {
 			clipboardy.writeSync(emojis[0]);
 		}
 	});
-
-	return;
+} else {
+	main();
 }
-
-readline.emitKeypressEvents(process.stdin);
-process.stdin.setRawMode(true);
-
-const onSelectEmoji = emoji => {
-	clipboardy.writeSync(emoji);
-	process.exit();
-};
-
-const onError = () => {
-	unmount();
-	process.exit(1);
-};
-
-const onExit = () => {
-	unmount();
-	process.exit();
-};
-
-// Use `h` instead of JSX to avoid transpiling this file
-const unmount = mount(h(ui, {skinNumber, onSelectEmoji, onError, onExit}));
