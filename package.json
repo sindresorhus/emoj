@@ -49,7 +49,7 @@
   },
   "devDependencies": {
     "ava": "*",
-    "eslint-config-xo-react": "^0.12.0",
+    "eslint-config-xo-react": "^0.13.0",
     "eslint-plugin-react": "^7.1.0",
     "xo": "^0.18.2"
   },
@@ -57,15 +57,8 @@
     "extends": [
       "xo-react"
     ],
-    "plugins": [
-      "react"
-    ],
     "rules": {
-      "react/prop-types": 0,
-      "react/jsx-closing-bracket-location": [
-        "error",
-        "tag-aligned"
-      ]
+      "react/prop-types": 0
     },
     "settings": {
       "react": {

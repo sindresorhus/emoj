@@ -1,6 +1,6 @@
 'use strict';
 const dns = require('dns');
-const {h, Component, Text} = require('ink');
+const {h, Component, Indent, Text} = require('ink');
 const debounce = require('lodash.debounce');
 const skinTone = require('skin-tone');
 const autoBind = require('auto-bind');
@@ -48,19 +48,20 @@ const QueryInput = ({query, placeholder}) => (
 	</div>
 );
 
-const Emoji = ({emoji, skinNumber, isSelected}) => {
-	emoji = skinTone(emoji, skinNumber);
+const Emoji = ({emoji, skinNumber}) => (
+	<div>
+		{skinTone(emoji, skinNumber)}
+		{'  '}
+	</div>
+);
 
-	return (
-		<div>
-			<Text underline={isSelected}>
-				{emoji}
-			</Text>
-
-			{'  '}
-		</div>
-	);
-};
+const SelectedIndicator = ({selectedIndex}) => (
+	<Indent size={selectedIndex} indent="   ">
+		<Text cyan>
+			↑
+		</Text>
+	</Indent>
+);
 
 const CopiedMessage = ({emoji}) => (
 	<Text green>
@@ -74,7 +75,6 @@ const Search = ({query, emojis, skinNumber, selectedIndex}) => {
 			key={emoji}
 			emoji={emoji}
 			skinNumber={skinNumber}
-			isSelected={index === selectedIndex}
 		/>
 	));
 
@@ -87,6 +87,9 @@ const Search = ({query, emojis, skinNumber, selectedIndex}) => {
 
 			<br/>
 			{list}
+			<br/>
+
+			{emojis.length > 0 && <SelectedIndicator selectedIndex={selectedIndex}/>}
 		</div>
 	);
 };
