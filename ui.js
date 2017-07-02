@@ -70,7 +70,7 @@ const CopiedMessage = ({emoji}) => (
 );
 
 const Search = ({query, emojis, skinNumber, selectedIndex}) => {
-	const list = emojis.map((emoji, index) => (
+	const list = emojis.map(emoji => (
 		<Emoji
 			key={emoji}
 			emoji={emoji}
