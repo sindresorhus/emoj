@@ -41,7 +41,7 @@
     "got": "^6.3.0",
     "has-ansi": "^2.0.0",
     "import-jsx": "^1.0.0",
-    "ink": "github:vadimdemedes/ink",
+    "ink": "^0.1.1",
     "lodash.debounce": "^4.0.6",
     "mem": "^1.1.0",
     "meow": "^3.7.0",
