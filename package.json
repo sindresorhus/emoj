@@ -36,10 +36,10 @@
   ],
   "dependencies": {
     "auto-bind": "^1.1.0",
-    "clipboardy": "^0.1.1",
+    "clipboardy": "^1.1.4",
     "conf": "^1.0.0",
-    "got": "^6.3.0",
-    "has-ansi": "^2.0.0",
+    "got": "^7.1.0",
+    "has-ansi": "^3.0.0",
     "import-jsx": "^1.0.0",
     "ink": "^0.1.1",
     "lodash.debounce": "^4.0.6",
