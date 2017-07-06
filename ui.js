@@ -238,10 +238,9 @@ class Emoj extends Component {
 			return;
 		}
 
-		debouncer(() => {
-			fetch(query).then(emojis => {
-				this.setState({emojis});
-			});
+		debouncer(async () => {
+			const emojis = await fetch(query);
+			this.setState({emojis});
 		});
 	}
 }

@@ -11,14 +11,15 @@
 	},
 	"bin": "cli.js",
 	"engines": {
-		"node": ">=4"
+		"node": ">=8"
 	},
 	"scripts": {
 		"test": "xo && ava"
 	},
 	"files": [
+		"cli.js",
 		"index.js",
-		"cli.js"
+		"ui.js"
 	],
 	"keywords": [
 		"cli-app",

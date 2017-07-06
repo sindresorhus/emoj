@@ -69,13 +69,13 @@ const main = () => {
 		process.exit();
 	};
 
-	// Use `h` instead of JSX to avoid transpiling this file
+	// Uses `h` instead of JSX to avoid transpiling this file
 	unmount = mount(h(ui, {skinNumber, onSelectEmoji, onError, onExit}));
 };
 
 if (cli.input.length > 0) {
-	emoj(cli.input[0]).then(emojis => {
-		emojis = emojis
+	(async () => {
+		const emojis = (await emoj(cli.input[0]))
 			.slice(0, 7)
 			.map(emoji => skinTone(emoji, skinNumber));
 
@@ -84,7 +84,7 @@ if (cli.input.length > 0) {
 		if (cli.flags.copy) {
 			clipboardy.writeSync(emojis[0]);
 		}
-	});
+	})();
 } else {
 	main();
 }
