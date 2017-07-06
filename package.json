@@ -1,69 +1,69 @@
 {
-  "name": "emoj",
-  "version": "1.1.0",
-  "description": "Find relevant emoji from text on the command-line",
-  "license": "MIT",
-  "repository": "sindresorhus/emoj",
-  "author": {
-    "name": "Sindre Sorhus",
-    "email": "sindresorhus@gmail.com",
-    "url": "sindresorhus.com"
-  },
-  "bin": "cli.js",
-  "engines": {
-    "node": ">=4"
-  },
-  "scripts": {
-    "test": "xo && ava"
-  },
-  "files": [
-    "index.js",
-    "cli.js"
-  ],
-  "keywords": [
-    "cli-app",
-    "cli",
-    "emoji",
-    "emojis",
-    "emoj",
-    "emoticon",
-    "search",
-    "find",
-    "matching",
-    "relevant",
-    "neural",
-    "networks"
-  ],
-  "dependencies": {
-    "auto-bind": "^1.1.0",
-    "clipboardy": "^1.1.4",
-    "conf": "^1.0.0",
-    "got": "^7.1.0",
-    "has-ansi": "^3.0.0",
-    "import-jsx": "^1.0.0",
-    "ink": "^0.1.1",
-    "lodash.debounce": "^4.0.6",
-    "mem": "^1.1.0",
-    "meow": "^3.7.0",
-    "skin-tone": "^1.0.0"
-  },
-  "devDependencies": {
-    "ava": "*",
-    "eslint-config-xo-react": "^0.13.0",
-    "eslint-plugin-react": "^7.1.0",
-    "xo": "^0.18.2"
-  },
-  "xo": {
-    "extends": [
-      "xo-react"
-    ],
-    "rules": {
-      "react/prop-types": 0
-    },
-    "settings": {
-      "react": {
-        "pragma": "h"
-      }
-    }
-  }
+	"name": "emoj",
+	"version": "1.1.0",
+	"description": "Find relevant emoji from text on the command-line",
+	"license": "MIT",
+	"repository": "sindresorhus/emoj",
+	"author": {
+		"name": "Sindre Sorhus",
+		"email": "sindresorhus@gmail.com",
+		"url": "sindresorhus.com"
+	},
+	"bin": "cli.js",
+	"engines": {
+		"node": ">=4"
+	},
+	"scripts": {
+		"test": "xo && ava"
+	},
+	"files": [
+		"index.js",
+		"cli.js"
+	],
+	"keywords": [
+		"cli-app",
+		"cli",
+		"emoji",
+		"emojis",
+		"emoj",
+		"emoticon",
+		"search",
+		"find",
+		"matching",
+		"relevant",
+		"neural",
+		"networks"
+	],
+	"dependencies": {
+		"auto-bind": "^1.1.0",
+		"clipboardy": "^1.1.4",
+		"conf": "^1.0.0",
+		"got": "^7.1.0",
+		"has-ansi": "^3.0.0",
+		"import-jsx": "^1.0.0",
+		"ink": "^0.1.1",
+		"lodash.debounce": "^4.0.6",
+		"mem": "^1.1.0",
+		"meow": "^3.7.0",
+		"skin-tone": "^1.0.0"
+	},
+	"devDependencies": {
+		"ava": "*",
+		"eslint-config-xo-react": "^0.13.0",
+		"eslint-plugin-react": "^7.1.0",
+		"xo": "^0.18.2"
+	},
+	"xo": {
+		"extends": [
+			"xo-react"
+		],
+		"rules": {
+			"react/prop-types": 0
+		},
+		"settings": {
+			"react": {
+				"pragma": "h"
+			}
+		}
+	}
 }
