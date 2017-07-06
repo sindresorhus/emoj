@@ -230,7 +230,12 @@ class Emoj extends Component {
 			this.fetchEmojis(nextQuery);
 		}
 
-		this.setState({query, skinNumber, selectedIndex});
+		this.setState({
+			query,
+			skinNumber,
+			selectedIndex,
+			emojis: []
+		});
 	}
 
 	fetchEmojis(query) {
