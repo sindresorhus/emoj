@@ -65,7 +65,7 @@ const SelectedIndicator = ({selectedIndex}) => (
 
 const CopiedMessage = ({emoji}) => (
 	<Text green>
-		{`${emoji}  has been copied to clipboard.`}
+		{`${emoji}  has been copied to the clipboard`}
 	</Text>
 );
 
