@@ -236,7 +236,9 @@ class Emoj extends Component {
 			}
 		}
 
-		this.setState({skinNumber, selectedIndex});
+		if (key.sequence !== ch) {
+			this.setState({skinNumber, selectedIndex});
+		}
 	}
 
 	fetchEmojis(query) {
