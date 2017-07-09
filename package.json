@@ -11,14 +11,15 @@
 	},
 	"bin": "cli.js",
 	"engines": {
-		"node": ">=4"
+		"node": ">=8"
 	},
 	"scripts": {
 		"test": "xo && ava"
 	},
 	"files": [
+		"cli.js",
 		"index.js",
-		"cli.js"
+		"ui.js"
 	],
 	"keywords": [
 		"cli-app",
@@ -40,7 +41,7 @@
 		"conf": "^1.0.0",
 		"got": "^7.1.0",
 		"has-ansi": "^3.0.0",
-		"import-jsx": "^1.0.0",
+		"import-jsx": "^1.2.0",
 		"ink": "^0.1.1",
 		"lodash.debounce": "^4.0.6",
 		"mem": "^1.1.0",
