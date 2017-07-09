@@ -229,12 +229,18 @@ class Emoj extends Component {
 		}
 
 		const nextQuery = query.join('');
+		const isQueryChanged = prevQuery !== nextQuery;
 
-		if (prevQuery !== nextQuery) {
+		if (isQueryChanged) {
 			this.fetchEmojis(nextQuery);
 		}
 
-		this.setState({query, skinNumber, selectedIndex});
+		this.setState({
+			query,
+			skinNumber,
+			selectedIndex: isQueryChanged ? 0 : selectedIndex,
+			emojis: isQueryChanged ? [] : emojis
+		});
 	}
 
 	fetchEmojis(query) {
