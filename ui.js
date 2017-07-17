@@ -1,6 +1,7 @@
 'use strict';
 const dns = require('dns');
 const {h, Component, Indent, Text} = require('ink');
+const TextInput = require('ink-text-input');
 const debounce = require('lodash.debounce');
 const skinTone = require('skin-tone');
 const autoBind = require('auto-bind');
@@ -34,7 +35,7 @@ const OfflineMessage = () => (
 	</div>
 );
 
-const QueryInput = ({query, placeholder}) => (
+const QueryInput = ({query, placeholder, onChange}) => (
 	<div>
 		<Text bold>
 			<Text cyan>
@@ -43,7 +44,7 @@ const QueryInput = ({query, placeholder}) => (
 
 			{' '}
 
-			{query.length > 0 ? query : <Text dim>{placeholder}</Text>}
+			<TextInput value={query} placeholder={placeholder} onChange={onChange}/>
 		</Text>
 	</div>
 );
@@ -69,7 +70,7 @@ const CopiedMessage = ({emoji}) => (
 	</Text>
 );
 
-const Search = ({query, emojis, skinNumber, selectedIndex}) => {
+const Search = ({query, emojis, skinNumber, selectedIndex, onChangeQuery}) => {
 	const list = emojis.map(emoji => (
 		<Emoji
 			key={emoji}
@@ -83,6 +84,7 @@ const Search = ({query, emojis, skinNumber, selectedIndex}) => {
 			<QueryInput
 				query={query}
 				placeholder="Relevant emojis will appear when you start writing"
+				onChange={onChangeQuery}
 			/>
 
 			<br/>
@@ -101,7 +103,7 @@ class Emoj extends Component {
 
 		this.state = {
 			stage: STAGE_CHECKING,
-			query: [],
+			query: '',
 			emojis: [],
 			skinNumber: props.skinNumber,
 			selectedIndex: 0,
@@ -127,10 +129,11 @@ class Emoj extends Component {
 				{stage === STAGE_COPIED && <CopiedMessage emoji={selectedEmoji}/>}
 				{stage === STAGE_SEARCH && (
 					<Search
-						query={query.join('')}
+						query={query}
 						emojis={emojis}
 						skinNumber={skinNumber}
 						selectedIndex={selectedIndex}
+						onChangeQuery={this.handleChangeQuery}
 					/>
 				)}
 			</div>
@@ -147,19 +150,24 @@ class Emoj extends Component {
 					return;
 				}
 
-				process.stdin.on('keypress', this.handleKeypress);
+				process.stdin.on('keypress', this.handleKeyPress);
 			});
 		});
 	}
 
-	handleKeypress(ch, key) {
+	handleChangeQuery(query) {
+		this.setState({
+			query,
+			emojis: [],
+			selectedIndex: 0
+		});
+
+		this.fetchEmojis(query);
+	}
+
+	handleKeyPress(ch, key = {}) {
 		const {onExit, onSelectEmoji} = this.props;
-		let {skinNumber, selectedIndex, emojis} = this.state;
-
-		const query = [].slice.call(this.state.query);
-		const prevQuery = query.join('');
-
-		key = key || {};
+		let {skinNumber, selectedIndex, emojis, query} = this.state;
 
 		// Filter out all ansi sequences except the up/down keys which change the skin tone
 		// and left/right keys which select emoji inside a list
@@ -191,9 +199,7 @@ class Emoj extends Component {
 			return;
 		}
 
-		if (key.name === 'backspace') {
-			query.pop();
-		} else if (key.name === 'return' || (key.ctrl && key.name === 'u')) {
+		if (key.name === 'return') {
 			if (emojis.length > 0) {
 				this.setState({
 					selectedEmoji: skinTone(emojis[selectedIndex], skinNumber),
@@ -204,43 +210,39 @@ class Emoj extends Component {
 			}
 
 			return;
-		} else if (key.name === 'up') {
+		}
+
+		if (key.name === 'up') {
 			if (skinNumber < 5) {
 				skinNumber++;
 			}
-		} else if (key.name === 'down') {
+		}
+
+		if (key.name === 'down') {
 			if (skinNumber > 0) {
 				skinNumber--;
 			}
-		} else if (key.name === 'right') {
+		}
+
+		if (key.name === 'right') {
 			if (selectedIndex < emojis.length - 1) {
 				selectedIndex++;
 			} else {
 				selectedIndex = 0;
 			}
-		} else if (key.name === 'left') {
+		}
+
+		if (key.name === 'left') {
 			if (selectedIndex > 0) {
 				selectedIndex--;
 			} else {
 				selectedIndex = emojis.length - 1;
 			}
-		} else {
-			query.push(ch);
 		}
 
-		const nextQuery = query.join('');
-		const isQueryChanged = prevQuery !== nextQuery;
-
-		if (isQueryChanged) {
-			this.fetchEmojis(nextQuery);
+		if (key.sequence !== ch) {
+			this.setState({skinNumber, selectedIndex});
 		}
-
-		this.setState({
-			query,
-			skinNumber,
-			selectedIndex: isQueryChanged ? 0 : selectedIndex,
-			emojis: isQueryChanged ? [] : emojis
-		});
 	}
 
 	fetchEmojis(query) {
