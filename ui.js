@@ -199,7 +199,7 @@ class Emoj extends Component {
 			return;
 		}
 
-		if (key.name === 'return' || (key.ctrl && key.name === 'u')) {
+		if (key.name === 'return') {
 			if (emojis.length > 0) {
 				this.setState({
 					selectedEmoji: skinTone(emojis[selectedIndex], skinNumber),
