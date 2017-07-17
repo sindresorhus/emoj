@@ -227,12 +227,16 @@ class Emoj extends Component {
 		if (key.name === 'right') {
 			if (selectedIndex < emojis.length - 1) {
 				selectedIndex++;
+			} else {
+				selectedIndex = 0;
 			}
 		}
 
 		if (key.name === 'left') {
 			if (selectedIndex > 0) {
 				selectedIndex--;
+			} else {
+				selectedIndex = emojis.length - 1;
 			}
 		}
 
