@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 'use strict';
-const readline = require('readline');
 const meow = require('meow');
 const importJsx = require('import-jsx');
-const {h, mount} = require('ink');
+const {h, render} = require('ink');
 const clipboardy = require('clipboardy');
 const skinTone = require('skin-tone');
 const Conf = require('conf');
@@ -49,9 +48,6 @@ if (cli.flags.skinTone !== undefined) {
 const skinNumber = config.get('skinNumber');
 
 const main = () => {
-	readline.emitKeypressEvents(process.stdin);
-	process.stdin.setRawMode(true);
-
 	const onSelectEmoji = emoji => {
 		clipboardy.writeSync(emoji);
 		process.exit();
@@ -70,7 +66,7 @@ const main = () => {
 	};
 
 	// Uses `h` instead of JSX to avoid transpiling this file
-	unmount = mount(h(ui, {skinNumber, onSelectEmoji, onError, onExit}));
+	unmount = render(h(ui, {skinNumber, onSelectEmoji, onError, onExit}));
 };
 
 if (cli.input.length > 0) {
