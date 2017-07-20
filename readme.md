@@ -10,7 +10,7 @@ Check out the [Dango app](http://getdango.com) if you want something like this o
 
 ## Install
 
-Ensure you have [Node.js](https://nodejs.org) version 4 or higher installed. Then run the following:
+Ensure you have [Node.js](https://nodejs.org) version 8 or higher installed. Then run the following:
 
 ```
 $ npm install --global emoj
