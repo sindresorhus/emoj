@@ -27,10 +27,9 @@ const OfflineMessage = () => (
 		</Text>
 
 		<Text dim>
-			{` Please check your internet connection`}
+			{' Please check your internet connection'}
 		</Text>
 
-		<br/>
 		<br/>
 	</div>
 );
@@ -50,10 +49,10 @@ const QueryInput = ({query, placeholder, onChange}) => (
 );
 
 const Emoji = ({emoji, skinNumber}) => (
-	<div>
+	<span>
 		{skinTone(emoji, skinNumber)}
 		{'  '}
-	</div>
+	</span>
 );
 
 const SelectedIndicator = ({selectedIndex}) => (
@@ -80,7 +79,7 @@ const Search = ({query, emojis, skinNumber, selectedIndex, onChangeQuery}) => {
 	));
 
 	return (
-		<div>
+		<span>
 			<QueryInput
 				query={query}
 				placeholder="Relevant emojis will appear when you start writing"
@@ -92,7 +91,7 @@ const Search = ({query, emojis, skinNumber, selectedIndex, onChangeQuery}) => {
 			<br/>
 
 			{emojis.length > 0 && <SelectedIndicator selectedIndex={selectedIndex}/>}
-		</div>
+		</span>
 	);
 };
 
@@ -122,7 +121,7 @@ class Emoj extends Component {
 		} = this.state;
 
 		return (
-			<div>
+			<span>
 				<br/>
 
 				{stage === STAGE_OFFLINE && <OfflineMessage/>}
@@ -136,7 +135,7 @@ class Emoj extends Component {
 						onChangeQuery={this.handleChangeQuery}
 					/>
 				)}
-			</div>
+			</span>
 		);
 	}
 
@@ -252,7 +251,10 @@ class Emoj extends Component {
 
 		debouncer(async () => {
 			const emojis = await fetch(query);
-			this.setState({emojis});
+
+			if (this.state.query.length > 1) {
+				this.setState({emojis});
+			}
 		});
 	}
 }
