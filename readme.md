@@ -16,7 +16,7 @@ Ensure you have [Node.js](https://nodejs.org) version 8 or higher installed. The
 $ npm install --global emoj
 ```
 
-Works best on macOS. Terminals on Linux render emojis in monochrome as they don't support color emojis. On Linux, I would recommend installing [Emoji One](https://github.com/eosrei/emojione-color-font#install-on-linux) for full emoji coverage. [Doesn't really work on Windows.](https://github.com/sindresorhus/emoj/issues/5)
+Works best on macOS and Linux. Older Linux distributions don't support Color Emoji in the Terminal, but newer ones (like Ubuntu 1804 and Fedora 28) do. On Linux, I would recommend installing [Emoji One](https://github.com/eosrei/emojione-color-font#install-on-linux) for full emoji coverage. [Doesn't really work on Windows.](https://github.com/sindresorhus/emoj/issues/5)
 
 
 ## Usage
