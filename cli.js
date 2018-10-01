@@ -2,7 +2,8 @@
 'use strict';
 const meow = require('meow');
 const importJsx = require('import-jsx');
-const {h, render} = require('ink');
+const React = require('react');
+const {render} = require('ink');
 const clipboardy = require('clipboardy');
 const skinTone = require('skin-tone');
 const Conf = require('conf');
@@ -66,7 +67,7 @@ const main = () => {
 	};
 
 	// Uses `h` instead of JSX to avoid transpiling this file
-	unmount = render(h(ui, {skinNumber, onSelectEmoji, onError, onExit}));
+	unmount = render(React.createElement(ui, {skinNumber, onSelectEmoji, onError, onExit}));
 };
 
 if (cli.input.length > 0) {

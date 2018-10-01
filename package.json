@@ -40,13 +40,13 @@
 		"clipboardy": "^1.1.4",
 		"conf": "^1.0.0",
 		"got": "^7.1.0",
-		"has-ansi": "^3.0.0",
 		"import-jsx": "^1.2.0",
-		"ink": "^0.3.0",
-		"ink-text-input": "^1.0.0",
+		"ink": "^2.0.0-1",
+		"ink-text-input": "^3.0.0-0",
 		"lodash.debounce": "^4.0.6",
 		"mem": "^1.1.0",
 		"meow": "^3.7.0",
+		"react": "^16.5.2",
 		"skin-tone": "^1.0.0"
 	},
 	"devDependencies": {
@@ -61,11 +61,6 @@
 		],
 		"rules": {
 			"react/prop-types": 0
-		},
-		"settings": {
-			"react": {
-				"pragma": "h"
-			}
 		}
 	}
 }
