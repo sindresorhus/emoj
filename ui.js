@@ -63,7 +63,7 @@ const Emoji = ({emoji, skinNumber}) => (
 );
 
 const SelectedIndicator = ({selectedIndex}) => (
-	<Box marginLeft={selectedIndex * 3}>
+	<Box marginLeft={selectedIndex * 4}>
 		<Color cyan>
 			↑
 		</Color>
@@ -86,7 +86,7 @@ const Search = ({query, emojis, skinNumber, selectedIndex, onChangeQuery}) => {
 	));
 
 	return (
-		<Box flexDirection="column">
+		<Box flexDirection="column" paddingTop={1} paddingBottom={emojis.length === 0 ? 2 : 0}>
 			<QueryInput
 				query={query}
 				placeholder="Relevant emojis will appear when you start writing"
@@ -169,18 +169,16 @@ class Emoj extends React.PureComponent {
 		this.fetchEmojis(query);
 	}
 
-	handleInput(data) {
+	handleInput(input) {
 		const {onExit, onSelectEmoji} = this.props;
 		let {skinNumber, selectedIndex, emojis, query} = this.state;
 
-		const s = String(data);
-
-		if (s === ESC || s === CTRL_C) {
+		if (input === ESC || input === CTRL_C) {
 			onExit();
 			return;
 		}
 
-		if (s === RETURN) {
+		if (input === RETURN) {
 			if (emojis.length > 0) {
 				this.setState({
 					selectedEmoji: skinTone(emojis[selectedIndex], skinNumber),
@@ -196,7 +194,7 @@ class Emoj extends React.PureComponent {
 		// Select emoji by typing a number
 		// Catch all 10 keys, but handle only the same amount of keys
 		// as there are currently emojis
-		const numKey = Number(s);
+		const numKey = Number(input);
 		if (numKey >= 0 && numKey <= 9) {
 			if (numKey >= 1 && numKey <= emojis.length) {
 				this.setState({
@@ -212,25 +210,25 @@ class Emoj extends React.PureComponent {
 
 		// Filter out all ansi sequences except the up/down keys which change the skin tone
 		// and left/right keys which select emoji inside a list
-		const isArrowKey = [ARROW_UP, ARROW_DOWN, ARROW_LEFT, ARROW_RIGHT].includes(s);
+		const isArrowKey = [ARROW_UP, ARROW_DOWN, ARROW_LEFT, ARROW_RIGHT].includes(input);
 
 		if (!isArrowKey || query.length <= 1) {
 			return;
 		}
 
-		if (s === ARROW_UP) {
+		if (input === ARROW_UP) {
 			if (skinNumber < 5) {
 				skinNumber++;
 			}
 		}
 
-		if (s === ARROW_DOWN) {
+		if (input === ARROW_DOWN) {
 			if (skinNumber > 0) {
 				skinNumber--;
 			}
 		}
 
-		if (s === ARROW_RIGHT) {
+		if (input === ARROW_RIGHT) {
 			if (selectedIndex < emojis.length - 1) {
 				selectedIndex++;
 			} else {
@@ -238,7 +236,7 @@ class Emoj extends React.PureComponent {
 			}
 		}
 
-		if (s === ARROW_LEFT) {
+		if (input === ARROW_LEFT) {
 			if (selectedIndex > 0) {
 				selectedIndex--;
 			} else {

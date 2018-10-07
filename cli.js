@@ -51,7 +51,7 @@ const skinNumber = config.get('skinNumber');
 const main = () => {
 	const onSelectEmoji = emoji => {
 		clipboardy.writeSync(emoji);
-		process.exit();
+		onExit();
 	};
 
 	let unmount; // eslint-disable-line prefer-const
@@ -66,7 +66,7 @@ const main = () => {
 		process.exit();
 	};
 
-	// Uses `h` instead of JSX to avoid transpiling this file
+	// Uses `React.createElement` instead of JSX to avoid transpiling this file
 	unmount = render(React.createElement(ui, {skinNumber, onSelectEmoji, onError, onExit}));
 };
 
