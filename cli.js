@@ -49,11 +49,6 @@ if (cli.flags.skinTone !== undefined) {
 const skinNumber = config.get('skinNumber');
 
 const main = () => {
-	const onSelectEmoji = emoji => {
-		clipboardy.writeSync(emoji);
-		onExit();
-	};
-
 	let unmount; // eslint-disable-line prefer-const
 
 	const onError = () => {
@@ -64,6 +59,11 @@ const main = () => {
 	const onExit = () => {
 		unmount();
 		process.exit();
+	};
+
+	const onSelectEmoji = emoji => {
+		clipboardy.writeSync(emoji);
+		onExit();
 	};
 
 	// Uses `React.createElement` instead of JSX to avoid transpiling this file
