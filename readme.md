@@ -43,6 +43,7 @@ $ emoj --help
 ## Related
 
 - [alfred-emoj](https://github.com/sindresorhus/alfred-emoj) - Alfred plugin
+- [inquirer-emoji](https://github.com/tannerntannern/inquirer-emoji) - Prompt plugin for `inquirer`
 
 
 ## License
