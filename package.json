@@ -39,6 +39,7 @@
 		"auto-bind": "^1.1.0",
 		"clipboardy": "^1.1.4",
 		"conf": "^1.0.0",
+		"emojilib": "^2.4.0",
 		"got": "^7.1.0",
 		"has-ansi": "^3.0.0",
 		"import-jsx": "^1.2.0",
