@@ -47,8 +47,14 @@ module.exports = async input => {
 		set.add(emoji);
 	}
 
-	for (const emoji of await getGetdangoEmojis(input)) {
-		set.add(emoji);
+	try {
+		for (const emoji of await getGetdangoEmojis(input)) {
+			set.add(emoji);
+		}
+	} catch (error) {
+		if (set.size === 0) {
+			throw error;
+		}
 	}
 
 	return [...set];
