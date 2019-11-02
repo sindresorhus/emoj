@@ -45,7 +45,7 @@
 		"ink": "^0.3.0",
 		"ink-text-input": "^1.0.0",
 		"lodash.debounce": "^4.0.6",
-		"mem": "^1.1.0",
+		"mem": "^5.1.1",
 		"meow": "^3.7.0",
 		"skin-tone": "^1.0.0"
 	},
