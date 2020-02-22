@@ -20,6 +20,7 @@ const STAGE_OFFLINE = 1;
 const STAGE_SEARCH = 2;
 const STAGE_COPIED = 3;
 
+// TODO: Move these to https://github.com/sindresorhus/ansi-escapes
 const ARROW_UP = '\u001b[A';
 const ARROW_DOWN = '\u001b[B';
 const ARROW_LEFT = '\u001b[D';
