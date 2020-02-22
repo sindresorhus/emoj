@@ -4,14 +4,15 @@
 	"description": "Find relevant emoji from text on the command-line",
 	"license": "MIT",
 	"repository": "sindresorhus/emoj",
+	"funding": "https://github.com/sponsors/sindresorhus",
 	"author": {
 		"name": "Sindre Sorhus",
 		"email": "sindresorhus@gmail.com",
-		"url": "sindresorhus.com"
+		"url": "https://sindresorhus.com"
 	},
 	"bin": "cli.js",
 	"engines": {
-		"node": ">=8"
+		"node": ">=10"
 	},
 	"scripts": {
 		"test": "xo && ava"
@@ -36,31 +37,33 @@
 		"networks"
 	],
 	"dependencies": {
-		"auto-bind": "^1.1.0",
-		"clipboardy": "^1.1.4",
-		"conf": "^1.0.0",
-		"got": "^7.1.0",
-		"import-jsx": "^1.2.0",
-		"ink": "^2.0.0-2",
-		"ink-text-input": "^3.0.0-0",
+		"auto-bind": "^4.0.0",
+		"clipboardy": "^2.2.0",
+		"conf": "^6.2.1",
+		"got": "^10.6.0",
+		"import-jsx": "^3.1.0",
+		"ink": "^2.7.1",
+		"ink-text-input": "^3.2.2",
 		"lodash.debounce": "^4.0.6",
-		"mem": "^1.1.0",
-		"meow": "^3.7.0",
+		"mem": "^6.0.1",
+		"meow": "^6.0.1",
 		"react": "^16.5.2",
 		"skin-tone": "^1.0.0"
 	},
 	"devDependencies": {
-		"ava": "*",
-		"eslint-config-xo-react": "^0.13.0",
+		"ava": "^1.4.0",
+		"eslint-config-xo-react": "^0.23.0",
 		"eslint-plugin-react": "^7.1.0",
-		"xo": "^0.18.2"
+		"eslint-plugin-react-hooks": "^2.4.0",
+		"xo": "^0.26.1"
 	},
 	"xo": {
 		"extends": [
 			"xo-react"
 		],
 		"rules": {
-			"react/prop-types": 0
+			"react/prop-types": "off",
+			"react/state-in-constructor": "off"
 		}
 	}
 }

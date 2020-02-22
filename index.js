@@ -2,12 +2,11 @@
 const got = require('got');
 
 module.exports = async input => {
-	const response = await got('emoji.getdango.com/api/emoji', {
-		json: true,
-		query: {
+	const {results} = await got('http://emoji.getdango.com/api/emoji', {
+		searchParams: {
 			q: input
 		}
-	});
+	}).json();
 
-	return response.body.results.map(x => x.text);
+	return results.map(result => result.text);
 };

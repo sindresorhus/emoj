@@ -1,17 +1,20 @@
 'use strict';
 const dns = require('dns');
 const React = require('react');
-const {Box, Color, Text, StdinContext} = require('ink');
+const {Box, Color, Text, AppContext, StdinContext} = require('ink');
 const TextInput = require('ink-text-input').default;
 const debounce = require('lodash.debounce');
 const skinTone = require('skin-tone');
-const autoBind = require('auto-bind');
+const autoBindReact = require('auto-bind/react');
 const mem = require('mem');
 const emoj = require('.');
 
 // Limit it to 7 results so not to overwhelm the user
 // This also reduces the chance of showing unrelated emojis
-const fetch = mem(str => emoj(str).then(arr => arr.slice(0, 7)));
+const fetch = mem(async string => {
+	const array = await emoj(string);
+	return array.slice(0, 7);
+});
 
 const debouncer = debounce(cb => cb(), 200);
 
@@ -21,12 +24,12 @@ const STAGE_SEARCH = 2;
 const STAGE_COPIED = 3;
 
 // TODO: Move these to https://github.com/sindresorhus/ansi-escapes
-const ARROW_UP = '\u001b[A';
-const ARROW_DOWN = '\u001b[B';
-const ARROW_LEFT = '\u001b[D';
-const ARROW_RIGHT = '\u001b[C';
-const ESC = '\u001b';
-const CTRL_C = '\x03';
+const ARROW_UP = '\u001B[A';
+const ARROW_DOWN = '\u001B[B';
+const ARROW_LEFT = '\u001B[D';
+const ARROW_RIGHT = '\u001B[C';
+const ESC = '\u001B';
+const CTRL_C = '\u0003';
 const RETURN = '\r';
 
 const OfflineMessage = () => (
@@ -63,14 +66,6 @@ const Emoji = ({emoji, skinNumber}) => (
 	</Box>
 );
 
-const SelectedIndicator = ({selectedIndex}) => (
-	<Box marginLeft={selectedIndex * 4}>
-		<Color cyan>
-			↑
-		</Color>
-	</Box>
-);
-
 const CopiedMessage = ({emoji}) => (
 	<Color green>
 		{`${emoji}  has been copied to the clipboard`}
@@ -78,12 +73,16 @@ const CopiedMessage = ({emoji}) => (
 );
 
 const Search = ({query, emojis, skinNumber, selectedIndex, onChangeQuery}) => {
-	const list = emojis.map(emoji => (
-		<Emoji
+	const list = emojis.map((emoji, index) => (
+		<Color
 			key={emoji}
-			emoji={emoji}
-			skinNumber={skinNumber}
-		/>
+			bgCyan={index === selectedIndex}
+		>
+			<Emoji
+				emoji={emoji}
+				skinNumber={skinNumber}
+			/>
+		</Color>
 	));
 
 	return (
@@ -93,12 +92,9 @@ const Search = ({query, emojis, skinNumber, selectedIndex, onChangeQuery}) => {
 				placeholder="Relevant emojis will appear when you start writing"
 				onChange={onChangeQuery}
 			/>
-
-			<Box>
+			<Box paddingTop={1}>
 				{list}
 			</Box>
-
-			{emojis.length > 0 && <SelectedIndicator selectedIndex={selectedIndex}/>}
 		</Box>
 	);
 };
@@ -106,7 +102,7 @@ const Search = ({query, emojis, skinNumber, selectedIndex, onChangeQuery}) => {
 class Emoj extends React.PureComponent {
 	constructor(props) {
 		super(props);
-		autoBind(this);
+		autoBindReact(this);
 
 		this.state = {
 			stage: STAGE_CHECKING,
@@ -146,8 +142,8 @@ class Emoj extends React.PureComponent {
 	}
 
 	componentDidMount() {
-		dns.lookup('emoji.getdango.com', err => {
-			const stage = err && err.code === 'ENOTFOUND' ? STAGE_OFFLINE : STAGE_SEARCH;
+		dns.lookup('emoji.getdango.com', error => {
+			const stage = error && error.code === 'ENOTFOUND' ? STAGE_OFFLINE : STAGE_SEARCH;
 
 			this.setState({stage}, () => {
 				if (stage === STAGE_OFFLINE) {
@@ -263,12 +259,14 @@ class Emoj extends React.PureComponent {
 	}
 }
 
-const EmojWithStdin = props => (
-	<StdinContext.Consumer>
-		{({stdin, setRawMode}) => (
-			<Emoj stdin={stdin} setRawMode={setRawMode} {...props}/>
+module.exports = props => (
+	<AppContext.Consumer>
+		{({exit}) => (
+			<StdinContext.Consumer>
+				{({stdin, setRawMode}) => (
+					<Emoj stdin={stdin} setRawMode={setRawMode} onExit={exit} {...props}/>
+				)}
+			</StdinContext.Consumer>
 		)}
-	</StdinContext.Consumer>
+	</AppContext.Consumer>
 );
-
-module.exports = EmojWithStdin;

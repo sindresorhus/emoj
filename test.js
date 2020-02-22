@@ -1,7 +1,7 @@
 import test from 'ava';
-import m from '.';
+import emoj from '.';
 
-test(async t => {
-	const [unicornEmoji] = await m('unicorn');
+test('main', async t => {
+	const [unicornEmoji] = await emoj('unicorn');
 	t.is(unicornEmoji, '🦄');
 });

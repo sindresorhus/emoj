@@ -48,26 +48,18 @@ if (cli.flags.skinTone !== undefined) {
 
 const skinNumber = config.get('skinNumber');
 
-const main = () => {
-	let unmount; // eslint-disable-line prefer-const
-
-	const onError = () => {
-		unmount();
-		process.exit(1);
-	};
-
-	const onExit = () => {
-		unmount();
-		process.exit();
-	};
+const main = async () => {
+	let app; // eslint-disable-line prefer-const
 
 	const onSelectEmoji = emoji => {
 		clipboardy.writeSync(emoji);
-		onExit();
+		app.unmount();
 	};
 
-	// Uses `React.createElement` instead of JSX to avoid transpiling this file
-	unmount = render(React.createElement(ui, {skinNumber, onSelectEmoji, onError, onExit}));
+	// Uses `React.createElement` instead of JSX to avoid transpiling this file.
+	app = render(React.createElement(ui, {skinNumber, onSelectEmoji}));
+
+	await app.waitUntilExit();
 };
 
 if (cli.input.length > 0) {

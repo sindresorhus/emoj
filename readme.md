@@ -5,19 +5,17 @@
 <img src="screenshot.gif" width="660">
 
 Uses the API from this great article on [Emoji & Deep Learning](http://getdango.com/emoji-and-deep-learning.html).<br>
-Check out the [Dango app](http://getdango.com) if you want something like this on your phone.
-
+Check out the [Dango app](https://getdango.com) if you want something like this on your phone.
 
 ## Install
 
-Ensure you have [Node.js](https://nodejs.org) version 8 or higher installed. Then run the following:
+Ensure you have [Node.js](https://nodejs.org) version 10 or higher installed. Then run the following:
 
 ```
 $ npm install --global emoj
 ```
 
 Works best on macOS and Linux. Older Linux distributions don't support color emoji in the terminal, but newer ones (like Ubuntu 18.04 and Fedora 28) do. On Linux, I would recommend installing [Emoji One](https://github.com/eosrei/emojione-color-font#install-on-linux) for full emoji coverage. [Doesn't really work on Windows.](https://github.com/sindresorhus/emoj/issues/5)
-
 
 ## Usage
 
@@ -39,13 +37,6 @@ $ emoj --help
   Use the up/down keys during live search to change the skin tone
 ```
 
-
 ## Related
 
 - [alfred-emoj](https://github.com/sindresorhus/alfred-emoj) - Alfred plugin
-- [inquirer-emoji](https://github.com/tannerntannern/inquirer-emoji) - Prompt plugin for `inquirer`
-
-
-## License
-
-MIT © [Sindre Sorhus](https://sindresorhus.com)
