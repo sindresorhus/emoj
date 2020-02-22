@@ -2,7 +2,8 @@
 'use strict';
 const meow = require('meow');
 const importJsx = require('import-jsx');
-const {h, render} = require('ink');
+const React = require('react');
+const {render} = require('ink');
 const clipboardy = require('clipboardy');
 const skinTone = require('skin-tone');
 const Conf = require('conf');
@@ -48,11 +49,6 @@ if (cli.flags.skinTone !== undefined) {
 const skinNumber = config.get('skinNumber');
 
 const main = () => {
-	const onSelectEmoji = emoji => {
-		clipboardy.writeSync(emoji);
-		process.exit();
-	};
-
 	let unmount; // eslint-disable-line prefer-const
 
 	const onError = () => {
@@ -65,8 +61,13 @@ const main = () => {
 		process.exit();
 	};
 
-	// Uses `h` instead of JSX to avoid transpiling this file
-	unmount = render(h(ui, {skinNumber, onSelectEmoji, onError, onExit}));
+	const onSelectEmoji = emoji => {
+		clipboardy.writeSync(emoji);
+		onExit();
+	};
+
+	// Uses `React.createElement` instead of JSX to avoid transpiling this file
+	unmount = render(React.createElement(ui, {skinNumber, onSelectEmoji, onError, onExit}));
 };
 
 if (cli.input.length > 0) {

@@ -1,11 +1,11 @@
 'use strict';
 const dns = require('dns');
-const {h, Component, Indent, Text} = require('ink');
-const TextInput = require('ink-text-input');
+const React = require('react');
+const {Box, Color, Text, StdinContext} = require('ink');
+const TextInput = require('ink-text-input').default;
 const debounce = require('lodash.debounce');
 const skinTone = require('skin-tone');
 const autoBind = require('auto-bind');
-const hasAnsi = require('has-ansi');
 const mem = require('mem');
 const emoj = require('.');
 
@@ -20,53 +20,61 @@ const STAGE_OFFLINE = 1;
 const STAGE_SEARCH = 2;
 const STAGE_COPIED = 3;
 
+// TODO: Move these to https://github.com/sindresorhus/ansi-escapes
+const ARROW_UP = '\u001b[A';
+const ARROW_DOWN = '\u001b[B';
+const ARROW_LEFT = '\u001b[D';
+const ARROW_RIGHT = '\u001b[C';
+const ESC = '\u001b';
+const CTRL_C = '\x03';
+const RETURN = '\r';
+
 const OfflineMessage = () => (
-	<div>
-		<Text bold red>
-			›
+	<Box>
+		<Text bold>
+			<Color red>
+				›
+			</Color>
 		</Text>
 
-		<Text dim>
+		<Color dim>
 			{' Please check your internet connection'}
-		</Text>
-
-		<br/>
-	</div>
+		</Color>
+	</Box>
 );
 
 const QueryInput = ({query, placeholder, onChange}) => (
-	<div>
+	<Box>
 		<Text bold>
-			<Text cyan>
+			<Color cyan>
 				›
-			</Text>
+			</Color>
 
 			{' '}
 
-			<TextInput value={query} placeholder={placeholder} onChange={onChange}/>
+			<TextInput showCursor={false} value={query} placeholder={placeholder} onChange={onChange}/>
 		</Text>
-	</div>
+	</Box>
 );
 
 const Emoji = ({emoji, skinNumber}) => (
-	<span>
+	<Box marginRight={2}>
 		{skinTone(emoji, skinNumber)}
-		{'  '}
-	</span>
+	</Box>
 );
 
 const SelectedIndicator = ({selectedIndex}) => (
-	<Indent size={selectedIndex} indent="   ">
-		<Text cyan>
+	<Box marginLeft={selectedIndex * 4}>
+		<Color cyan>
 			↑
-		</Text>
-	</Indent>
+		</Color>
+	</Box>
 );
 
 const CopiedMessage = ({emoji}) => (
-	<Text green>
+	<Color green>
 		{`${emoji}  has been copied to the clipboard`}
-	</Text>
+	</Color>
 );
 
 const Search = ({query, emojis, skinNumber, selectedIndex, onChangeQuery}) => {
@@ -79,23 +87,23 @@ const Search = ({query, emojis, skinNumber, selectedIndex, onChangeQuery}) => {
 	));
 
 	return (
-		<span>
+		<Box flexDirection="column" paddingTop={1} paddingBottom={emojis.length === 0 ? 2 : 0}>
 			<QueryInput
 				query={query}
 				placeholder="Relevant emojis will appear when you start writing"
 				onChange={onChangeQuery}
 			/>
 
-			<br/>
-			{list}
-			<br/>
+			<Box>
+				{list}
+			</Box>
 
 			{emojis.length > 0 && <SelectedIndicator selectedIndex={selectedIndex}/>}
-		</span>
+		</Box>
 	);
 };
 
-class Emoj extends Component {
+class Emoj extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		autoBind(this);
@@ -121,9 +129,7 @@ class Emoj extends Component {
 		} = this.state;
 
 		return (
-			<span>
-				<br/>
-
+			<Box>
 				{stage === STAGE_OFFLINE && <OfflineMessage/>}
 				{stage === STAGE_COPIED && <CopiedMessage emoji={selectedEmoji}/>}
 				{stage === STAGE_SEARCH && (
@@ -135,7 +141,7 @@ class Emoj extends Component {
 						onChangeQuery={this.handleChangeQuery}
 					/>
 				)}
-			</span>
+			</Box>
 		);
 	}
 
@@ -149,7 +155,7 @@ class Emoj extends Component {
 					return;
 				}
 
-				process.stdin.on('keypress', this.handleKeyPress);
+				this.props.stdin.on('data', this.handleInput);
 			});
 		});
 	}
@@ -164,27 +170,32 @@ class Emoj extends Component {
 		this.fetchEmojis(query);
 	}
 
-	handleKeyPress(ch, key = {}) {
+	handleInput(input) {
 		const {onExit, onSelectEmoji} = this.props;
 		let {skinNumber, selectedIndex, emojis, query} = this.state;
 
-		// Filter out all ansi sequences except the up/down keys which change the skin tone
-		// and left/right keys which select emoji inside a list
-		const isArrowKey = ['up', 'down', 'left', 'right'].includes(key.name);
-
-		if (hasAnsi(key.sequence) && (!isArrowKey || query.length <= 1)) {
+		if (input === ESC || input === CTRL_C) {
+			onExit();
 			return;
 		}
 
-		if (key.name === 'escape' || (key.ctrl && key.name === 'c')) {
-			onExit();
+		if (input === RETURN) {
+			if (emojis.length > 0) {
+				this.setState({
+					selectedEmoji: skinTone(emojis[selectedIndex], skinNumber),
+					stage: STAGE_COPIED
+				}, () => {
+					onSelectEmoji(this.state.selectedEmoji);
+				});
+			}
+
 			return;
 		}
 
 		// Select emoji by typing a number
 		// Catch all 10 keys, but handle only the same amount of keys
 		// as there are currently emojis
-		const numKey = Number(key.name);
+		const numKey = Number(input);
 		if (numKey >= 0 && numKey <= 9) {
 			if (numKey >= 1 && numKey <= emojis.length) {
 				this.setState({
@@ -198,32 +209,27 @@ class Emoj extends Component {
 			return;
 		}
 
-		if (key.name === 'return') {
-			if (emojis.length > 0) {
-				this.setState({
-					selectedEmoji: skinTone(emojis[selectedIndex], skinNumber),
-					stage: STAGE_COPIED
-				}, () => {
-					onSelectEmoji(this.state.selectedEmoji);
-				});
-			}
+		// Filter out all ansi sequences except the up/down keys which change the skin tone
+		// and left/right keys which select emoji inside a list
+		const isArrowKey = [ARROW_UP, ARROW_DOWN, ARROW_LEFT, ARROW_RIGHT].includes(input);
 
+		if (!isArrowKey || query.length <= 1) {
 			return;
 		}
 
-		if (key.name === 'up') {
+		if (input === ARROW_UP) {
 			if (skinNumber < 5) {
 				skinNumber++;
 			}
 		}
 
-		if (key.name === 'down') {
+		if (input === ARROW_DOWN) {
 			if (skinNumber > 0) {
 				skinNumber--;
 			}
 		}
 
-		if (key.name === 'right') {
+		if (input === ARROW_RIGHT) {
 			if (selectedIndex < emojis.length - 1) {
 				selectedIndex++;
 			} else {
@@ -231,7 +237,7 @@ class Emoj extends Component {
 			}
 		}
 
-		if (key.name === 'left') {
+		if (input === ARROW_LEFT) {
 			if (selectedIndex > 0) {
 				selectedIndex--;
 			} else {
@@ -239,9 +245,7 @@ class Emoj extends Component {
 			}
 		}
 
-		if (key.sequence !== ch) {
-			this.setState({skinNumber, selectedIndex});
-		}
+		this.setState({skinNumber, selectedIndex});
 	}
 
 	fetchEmojis(query) {
@@ -259,4 +263,12 @@ class Emoj extends Component {
 	}
 }
 
-module.exports = Emoj;
+const EmojWithStdin = props => (
+	<StdinContext.Consumer>
+		{({stdin, setRawMode}) => (
+			<Emoj stdin={stdin} setRawMode={setRawMode} {...props}/>
+		)}
+	</StdinContext.Consumer>
+);
+
+module.exports = EmojWithStdin;
