@@ -12,14 +12,14 @@ const getGetdangoEmojis = async input => {
 	return results.map(result => result.text);
 };
 
-// This value was picked experimentally
+// This value was picked experimentally, substring search returns a lot of noise for shorter search words
 const MIN_WORD_LENGTH_FOR_SUBSTRING_SEARCH = 4;
 
 const getEmojilibEmojis = input => {
 	const reSource = input.toLowerCase().split(/\s/g)
 		.map(v => v.replace(/\W/g, ''))
 		.filter(v => v.length > 0)
-		.map(v => v.length < MIN_WORD_LENGTH_FOR_SUBSTRING_SEARCH ? `^${v}$` : v) // Substring search returns a lot of noise for short search words
+		.map(v => v.length < MIN_WORD_LENGTH_FOR_SUBSTRING_SEARCH ? `^${v}$` : v)
 		.join('|');
 
 	if (reSource.length === 0) {
