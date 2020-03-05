@@ -4,8 +4,7 @@
 
 <img src="screenshot.gif" width="660">
 
-Uses the API from this great article on [Emoji & Deep Learning](http://getdango.com/emoji-and-deep-learning.html) and local emoji database.<br>
-Check out the [Dango app](https://getdango.com) if you want something like this on your phone.
+Uses the API from this great article on [Emoji & Deep Learning](http://getdango.com/emoji-and-deep-learning.html) and a local emoji database.
 
 ## Install
 

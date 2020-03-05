@@ -44,15 +44,9 @@ const QueryInput = ({query, placeholder, onChange}) => (
 	</Box>
 );
 
-const Emoji = ({emoji, skinNumber}) => (
-	<Box marginRight={2}>
-		{skinTone(emoji, skinNumber)}
-	</Box>
-);
-
 const CopiedMessage = ({emoji}) => (
 	<Color green>
-		{`${emoji}  has been copied to the clipboard`}
+		{`${emoji} has been copied to the clipboard`}
 	</Color>
 );
 
@@ -60,12 +54,13 @@ const Search = ({query, emojis, skinNumber, selectedIndex, onChangeQuery}) => {
 	const list = emojis.map((emoji, index) => (
 		<Color
 			key={emoji}
-			bgCyan={index === selectedIndex}
+			bgGray={index === selectedIndex}
 		>
-			<Emoji
-				emoji={emoji}
-				skinNumber={skinNumber}
-			/>
+			<Text>
+				{' '}
+				{skinTone(emoji, skinNumber)}
+				{' '}
+			</Text>
 		</Color>
 	));
 
