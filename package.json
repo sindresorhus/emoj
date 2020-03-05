@@ -40,6 +40,7 @@
 		"auto-bind": "^4.0.0",
 		"clipboardy": "^2.2.0",
 		"conf": "^6.2.1",
+		"emojilib": "^2.4.0",
 		"got": "^10.6.0",
 		"import-jsx": "^3.1.0",
 		"ink": "^2.7.1",

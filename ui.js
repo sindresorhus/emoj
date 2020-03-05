@@ -1,5 +1,4 @@
 'use strict';
-const dns = require('dns');
 const React = require('react');
 const {Box, Color, Text, AppContext, StdinContext} = require('ink');
 const TextInput = require('ink-text-input').default;
@@ -19,9 +18,8 @@ const fetch = mem(async string => {
 const debouncer = debounce(cb => cb(), 200);
 
 const STAGE_CHECKING = 0;
-const STAGE_OFFLINE = 1;
-const STAGE_SEARCH = 2;
-const STAGE_COPIED = 3;
+const STAGE_SEARCH = 1;
+const STAGE_COPIED = 2;
 
 // TODO: Move these to https://github.com/sindresorhus/ansi-escapes
 const ARROW_UP = '\u001B[A';
@@ -31,20 +29,6 @@ const ARROW_RIGHT = '\u001B[C';
 const ESC = '\u001B';
 const CTRL_C = '\u0003';
 const RETURN = '\r';
-
-const OfflineMessage = () => (
-	<Box>
-		<Text bold>
-			<Color red>
-				›
-			</Color>
-		</Text>
-
-		<Color dim>
-			{' Please check your internet connection'}
-		</Color>
-	</Box>
-);
 
 const QueryInput = ({query, placeholder, onChange}) => (
 	<Box>
@@ -126,7 +110,6 @@ class Emoj extends React.PureComponent {
 
 		return (
 			<Box>
-				{stage === STAGE_OFFLINE && <OfflineMessage/>}
 				{stage === STAGE_COPIED && <CopiedMessage emoji={selectedEmoji}/>}
 				{stage === STAGE_SEARCH && (
 					<Search
@@ -142,17 +125,8 @@ class Emoj extends React.PureComponent {
 	}
 
 	componentDidMount() {
-		dns.lookup('emoji.getdango.com', error => {
-			const stage = error && error.code === 'ENOTFOUND' ? STAGE_OFFLINE : STAGE_SEARCH;
-
-			this.setState({stage}, () => {
-				if (stage === STAGE_OFFLINE) {
-					this.props.onError();
-					return;
-				}
-
-				this.props.stdin.on('data', this.handleInput);
-			});
+		this.setState({stage: STAGE_SEARCH}, () => {
+			this.props.stdin.on('data', this.handleInput);
 		});
 	}
 
