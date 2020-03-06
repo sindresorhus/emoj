@@ -37,6 +37,7 @@ const cli = meow(`
 });
 
 const config = new Conf({
+	projectName: 'emoj',
 	defaults: {
 		skinNumber: 0
 	}
