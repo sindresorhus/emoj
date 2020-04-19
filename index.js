@@ -3,6 +3,7 @@ const got = require('got');
 const emojilib = require('emojilib');
 
 const getGetdangoEmojis = async input => {
+	// Intentionally using `http` as the `https` endpoint has some stability problems.
 	const {results} = await got('http://emoji.getdango.com/api/emoji', {
 		searchParams: {
 			q: input
