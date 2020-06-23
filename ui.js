@@ -1,10 +1,10 @@
 'use strict';
 const React = require('react');
-const {Box, Color, Text, AppContext, StdinContext} = require('ink');
+const {useState, useCallback, useEffect} = require('react');
+const {Box, Text, useApp, useInput} = require('ink');
 const TextInput = require('ink-text-input').default;
 const debounce = require('lodash.debounce');
 const skinTone = require('skin-tone');
-const autoBindReact = require('auto-bind/react');
 const mem = require('mem');
 const emoj = require('.');
 
@@ -21,47 +21,32 @@ const STAGE_CHECKING = 0;
 const STAGE_SEARCH = 1;
 const STAGE_COPIED = 2;
 
-// TODO: Move these to https://github.com/sindresorhus/ansi-escapes
-const ARROW_UP = '\u001B[A';
-const ARROW_DOWN = '\u001B[B';
-const ARROW_LEFT = '\u001B[D';
-const ARROW_RIGHT = '\u001B[C';
-const ESC = '\u001B';
-const CTRL_C = '\u0003';
-const RETURN = '\r';
-
 const QueryInput = ({query, placeholder, onChange}) => (
 	<Box>
-		<Text bold>
-			<Color cyan>
-				›
-			</Color>
-
-			{' '}
-
-			<TextInput showCursor={false} value={query} placeholder={placeholder} onChange={onChange}/>
+		<Text bold color="cyan">
+			›{' '}
 		</Text>
+
+		<TextInput showCursor={false} value={query} placeholder={placeholder} onChange={onChange}/>
 	</Box>
 );
 
 const CopiedMessage = ({emoji}) => (
-	<Color green>
+	<Text color="green">
 		{`${emoji} has been copied to the clipboard`}
-	</Color>
+	</Text>
 );
 
 const Search = ({query, emojis, skinNumber, selectedIndex, onChangeQuery}) => {
 	const list = emojis.map((emoji, index) => (
-		<Color
+		<Text
 			key={emoji}
-			bgGray={index === selectedIndex}
+			backgroundColor={index === selectedIndex ? 'gray' : undefined}
 		>
-			<Text>
-				{' '}
-				{skinTone(emoji, skinNumber)}
-				{' '}
-			</Text>
-		</Color>
+			{' '}
+			{skinTone(emoji, skinNumber)}
+			{' '}
+		</Text>
 	));
 
 	return (
@@ -78,80 +63,59 @@ const Search = ({query, emojis, skinNumber, selectedIndex, onChangeQuery}) => {
 	);
 };
 
-class Emoj extends React.PureComponent {
-	constructor(props) {
-		super(props);
-		autoBindReact(this);
+const Emoj = ({skinNumber: initialSkinNumber, onSelectEmoji}) => {
+	const {exit} = useApp();
+	const [stage, setStage] = useState(STAGE_CHECKING);
+	const [query, setQuery] = useState('');
+	const [emojis, setEmojis] = useState([]);
+	const [skinNumber, setSkinNumber] = useState(initialSkinNumber);
+	const [selectedIndex, setSelectedIndex] = useState(0);
+	const [selectedEmoji, setSelectedEmoji] = useState(null);
 
-		this.state = {
-			stage: STAGE_CHECKING,
-			query: '',
-			emojis: [],
-			skinNumber: props.skinNumber,
-			selectedIndex: 0,
-			selectedEmoji: null
-		};
-	}
+	useEffect(() => {
+		if (selectedEmoji && stage === STAGE_COPIED) {
+			onSelectEmoji(selectedEmoji);
+		}
+	}, [selectedEmoji, stage, onSelectEmoji]);
 
-	render() {
-		const {
-			stage,
-			query,
-			emojis,
-			skinNumber,
-			selectedIndex,
-			selectedEmoji
-		} = this.state;
+	const changeQuery = useCallback(query => {
+		setSelectedIndex(0);
+		setEmojis([]);
+		setQuery(query);
+	});
 
-		return (
-			<Box>
-				{stage === STAGE_COPIED && <CopiedMessage emoji={selectedEmoji}/>}
-				{stage === STAGE_SEARCH && (
-					<Search
-						query={query}
-						emojis={emojis}
-						skinNumber={skinNumber}
-						selectedIndex={selectedIndex}
-						onChangeQuery={this.handleChangeQuery}
-					/>
-				)}
-			</Box>
-		);
-	}
+	useEffect(() => {
+		setStage(STAGE_SEARCH);
+	}, []);
 
-	componentDidMount() {
-		this.setState({stage: STAGE_SEARCH}, () => {
-			this.props.stdin.on('data', this.handleInput);
-		});
-	}
-
-	handleChangeQuery(query) {
-		this.setState({
-			query,
-			emojis: [],
-			selectedIndex: 0
-		});
-
-		this.fetchEmojis(query);
-	}
-
-	handleInput(input) {
-		const {onExit, onSelectEmoji} = this.props;
-		let {skinNumber, selectedIndex, emojis, query} = this.state;
-
-		if (input === ESC || input === CTRL_C) {
-			onExit();
+	useEffect(() => {
+		if (query.length <= 1) {
 			return;
 		}
 
-		if (input === RETURN) {
+		debouncer(async () => {
+			const emojis = await fetch(query);
+
+			if (query.length > 1) {
+				setEmojis(emojis);
+			}
+		});
+
+		return () => {
+			debouncer.cancel();
+		};
+	}, [query]);
+
+	useInput((input, key) => {
+		if (key.escape || (key.ctrl && input === 'c')) {
+			exit();
+			return;
+		}
+
+		if (key.return) {
 			if (emojis.length > 0) {
-				this.setState({
-					selectedEmoji: skinTone(emojis[selectedIndex], skinNumber),
-					stage: STAGE_COPIED
-				}, () => {
-					onSelectEmoji(this.state.selectedEmoji);
-				});
+				setSelectedEmoji(skinTone(emojis[selectedIndex], skinNumber));
+				setStage(STAGE_COPIED);
 			}
 
 			return;
@@ -163,12 +127,8 @@ class Emoj extends React.PureComponent {
 		const numKey = Number(input);
 		if (numKey >= 0 && numKey <= 9) {
 			if (numKey >= 1 && numKey <= emojis.length) {
-				this.setState({
-					selectedEmoji: skinTone(emojis[numKey - 1], skinNumber),
-					stage: STAGE_COPIED
-				}, () => {
-					onSelectEmoji(this.state.selectedEmoji);
-				});
+				setSelectedEmoji(skinTone(emojis[numKey - 1], skinNumber));
+				setStage(STAGE_COPIED);
 			}
 
 			return;
@@ -176,66 +136,51 @@ class Emoj extends React.PureComponent {
 
 		// Filter out all ansi sequences except the up/down keys which change the skin tone
 		// and left/right keys which select emoji inside a list
-		const isArrowKey = [ARROW_UP, ARROW_DOWN, ARROW_LEFT, ARROW_RIGHT].includes(input);
+		const isArrowKey = key.upArrow || key.downArrow || key.leftArrow || key.rightArrow;
 
 		if (!isArrowKey || query.length <= 1) {
 			return;
 		}
 
-		if (input === ARROW_UP) {
-			if (skinNumber < 5) {
-				skinNumber++;
-			}
+		if (key.upArrow && skinNumber < 5) {
+			setSkinNumber(skinNumber + 1);
 		}
 
-		if (input === ARROW_DOWN) {
-			if (skinNumber > 0) {
-				skinNumber--;
-			}
+		if (key.downArrow && skinNumber > 0) {
+			setSkinNumber(skinNumber - 1);
 		}
 
-		if (input === ARROW_RIGHT) {
+		if (key.rightArrow) {
 			if (selectedIndex < emojis.length - 1) {
-				selectedIndex++;
+				setSelectedIndex(selectedIndex + 1);
 			} else {
-				selectedIndex = 0;
+				setSelectedIndex(0);
 			}
 		}
 
-		if (input === ARROW_LEFT) {
+		if (key.leftArrow) {
 			if (selectedIndex > 0) {
-				selectedIndex--;
+				setSelectedIndex(selectedIndex - 1);
 			} else {
-				selectedIndex = emojis.length - 1;
+				setSelectedIndex(emojis.length - 1);
 			}
 		}
+	});
 
-		this.setState({skinNumber, selectedIndex});
-	}
+	return (
+		<>
+			{stage === STAGE_COPIED && <CopiedMessage emoji={selectedEmoji}/>}
+			{stage === STAGE_SEARCH && (
+				<Search
+					query={query}
+					emojis={emojis}
+					skinNumber={skinNumber}
+					selectedIndex={selectedIndex}
+					onChangeQuery={changeQuery}
+				/>
+			)}
+		</>
+	);
+};
 
-	fetchEmojis(query) {
-		if (query.length <= 1) {
-			return;
-		}
-
-		debouncer(async () => {
-			const emojis = await fetch(query);
-
-			if (this.state.query.length > 1) {
-				this.setState({emojis});
-			}
-		});
-	}
-}
-
-module.exports = props => (
-	<AppContext.Consumer>
-		{({exit}) => (
-			<StdinContext.Consumer>
-				{({stdin, setRawMode}) => (
-					<Emoj stdin={stdin} setRawMode={setRawMode} onExit={exit} {...props}/>
-				)}
-			</StdinContext.Consumer>
-		)}
-	</AppContext.Consumer>
-);
+module.exports = Emoj;
