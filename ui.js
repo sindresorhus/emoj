@@ -3,10 +3,26 @@ const React = require('react');
 const {useState, useCallback, useEffect} = require('react');
 const {Box, Text, useApp, useInput} = require('ink');
 const TextInput = require('ink-text-input').default;
-const debounce = require('lodash.debounce');
 const skinTone = require('skin-tone');
 const mem = require('mem');
 const emoj = require('.');
+
+// From https://usehooks.com/useDebounce/
+const useDebouncedValue = (value, delay) => {
+	const [debouncedValue, setDebouncedValue] = useState(value);
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setDebouncedValue(value);
+		}, delay);
+
+		return () => {
+			clearTimeout(timer);
+		};
+	}, [value, delay]);
+
+	return debouncedValue;
+};
 
 // Limit it to 7 results so not to overwhelm the user
 // This also reduces the chance of showing unrelated emojis
@@ -14,8 +30,6 @@ const fetch = mem(async string => {
 	const array = await emoj(string);
 	return array.slice(0, 7);
 });
-
-const debouncer = debounce(cb => cb(), 200);
 
 const STAGE_CHECKING = 0;
 const STAGE_SEARCH = 1;
@@ -41,7 +55,7 @@ const Search = ({query, emojis, skinNumber, selectedIndex, onChangeQuery}) => {
 	const list = emojis.map((emoji, index) => (
 		<Text
 			key={emoji}
-			backgroundColor={index === selectedIndex ? 'gray' : undefined}
+			backgroundColor={index === selectedIndex && 'gray'}
 		>
 			{' '}
 			{skinTone(emoji, skinNumber)}
@@ -70,7 +84,7 @@ const Emoj = ({skinNumber: initialSkinNumber, onSelectEmoji}) => {
 	const [emojis, setEmojis] = useState([]);
 	const [skinNumber, setSkinNumber] = useState(initialSkinNumber);
 	const [selectedIndex, setSelectedIndex] = useState(0);
-	const [selectedEmoji, setSelectedEmoji] = useState(null);
+	const [selectedEmoji, setSelectedEmoji] = useState();
 
 	useEffect(() => {
 		if (selectedEmoji && stage === STAGE_COPIED) {
@@ -88,23 +102,31 @@ const Emoj = ({skinNumber: initialSkinNumber, onSelectEmoji}) => {
 		setStage(STAGE_SEARCH);
 	}, []);
 
+	const debouncedQuery = useDebouncedValue(query, 200);
+
 	useEffect(() => {
-		if (query.length <= 1) {
+		if (debouncedQuery.length <= 1) {
 			return;
 		}
 
-		debouncer(async () => {
-			const emojis = await fetch(query);
+		let isCanceled = false;
 
-			if (query.length > 1) {
+		const run = async () => {
+			const emojis = await fetch(debouncedQuery);
+
+			// Don't update state when this effect was canceled to avoid
+			// results that don't match the search query
+			if (!isCanceled) {
 				setEmojis(emojis);
 			}
-		});
+		};
+
+		run();
 
 		return () => {
-			debouncer.cancel();
+			isCanceled = true;
 		};
-	}, [query]);
+	}, [debouncedQuery]);
 
 	useInput((input, key) => {
 		if (key.escape || (key.ctrl && input === 'c')) {
