@@ -83,6 +83,8 @@ class Emoj extends React.PureComponent {
 		super(props);
 		autoBindReact(this);
 
+		this.exiting = false;
+
 		this.state = {
 			stage: STAGE_CHECKING,
 			query: '',
@@ -140,6 +142,7 @@ class Emoj extends React.PureComponent {
 		let {skinNumber, selectedIndex, emojis, query} = this.state;
 
 		if (input === ESC || input === CTRL_C) {
+			this.exiting = true;
 			onExit();
 			return;
 		}
@@ -221,7 +224,7 @@ class Emoj extends React.PureComponent {
 		debouncer(async () => {
 			const emojis = await fetch(query);
 
-			if (this.state.query.length > 1) {
+			if (this.state.query.length > 1 && !this.exiting) {
 				this.setState({emojis});
 			}
 		});
