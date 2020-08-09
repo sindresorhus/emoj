@@ -146,10 +146,10 @@ const Emoj = ({skinNumber: initialSkinNumber, onSelectEmoji}) => {
 		// Select emoji by typing a number
 		// Catch all 10 keys, but handle only the same amount of keys
 		// as there are currently emojis
-		const numKey = Number(input);
-		if (numKey >= 0 && numKey <= 9) {
-			if (numKey >= 1 && numKey <= emojis.length) {
-				setSelectedEmoji(skinTone(emojis[numKey - 1], skinNumber));
+		const numberKey = Number(input);
+		if (numberKey >= 0 && numberKey <= 9) {
+			if (numberKey >= 1 && numberKey <= emojis.length) {
+				setSelectedEmoji(skinTone(emojis[numberKey - 1], skinNumber));
 				setStage(STAGE_COPIED);
 			}
 

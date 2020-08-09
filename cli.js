@@ -27,12 +27,15 @@ const cli = meow(`
 	Use the up/down keys during live search to change the skin tone
 	Use the left/right or 1..9 keys during live search to select the emoji
 `, {
-	boolean: [
-		'copy'
-	],
-	alias: {
-		c: 'copy',
-		s: 'skinTone'
+	flags: {
+		copy: {
+			type: 'boolean',
+			alias: 'c'
+		},
+		skinTone: {
+			type: 'number',
+			alias: 's'
+		}
 	}
 });
 
@@ -44,7 +47,7 @@ const config = new Conf({
 });
 
 if (cli.flags.skinTone !== undefined) {
-	config.set('skinNumber', Math.max(0, Math.min(5, Number(cli.flags.skinTone) || 0)));
+	config.set('skinNumber', Math.max(0, Math.min(5, cli.flags.skinTone || 0)));
 }
 
 const skinNumber = config.get('skinNumber');

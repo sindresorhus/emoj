@@ -38,23 +38,23 @@
 	],
 	"dependencies": {
 		"clipboardy": "^2.2.0",
-		"conf": "^6.2.1",
+		"conf": "^7.1.1",
 		"emojilib": "^2.4.0",
-		"got": "^10.6.0",
-		"import-jsx": "^3.1.0",
+		"got": "^11.5.2",
+		"import-jsx": "^4.0.0",
 		"ink": "^3.0.3",
 		"ink-text-input": "^4.0.0",
 		"mem": "^6.0.1",
-		"meow": "^6.0.1",
+		"meow": "^7.0.1",
 		"react": "^16.5.2",
 		"skin-tone": "^1.0.0"
 	},
 	"devDependencies": {
 		"ava": "^1.4.0",
 		"eslint-config-xo-react": "^0.23.0",
-		"eslint-plugin-react": "^7.1.0",
-		"eslint-plugin-react-hooks": "^2.4.0",
-		"xo": "^0.26.1"
+		"eslint-plugin-react": "^7.20.5",
+		"eslint-plugin-react-hooks": "^4.0.8",
+		"xo": "^0.32.1"
 	},
 	"xo": {
 		"extends": [
