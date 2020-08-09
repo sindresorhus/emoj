@@ -37,15 +37,13 @@
 		"networks"
 	],
 	"dependencies": {
-		"auto-bind": "^4.0.0",
 		"clipboardy": "^2.2.0",
 		"conf": "^6.2.1",
 		"emojilib": "^2.4.0",
 		"got": "^10.6.0",
 		"import-jsx": "^3.1.0",
-		"ink": "^2.7.1",
-		"ink-text-input": "^3.2.2",
-		"lodash.debounce": "^4.0.6",
+		"ink": "^3.0.3",
+		"ink-text-input": "^4.0.0",
 		"mem": "^6.0.1",
 		"meow": "^6.0.1",
 		"react": "^16.5.2",
