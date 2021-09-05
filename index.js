@@ -1,17 +1,5 @@
 'use strict';
-const got = require('got');
 const emojilib = require('emojilib');
-
-const getGetdangoEmojis = async input => {
-	// Intentionally using `http` as the `https` endpoint has some stability problems.
-	const {results} = await got('http://emoji.getdango.com/api/emoji', {
-		searchParams: {
-			q: input
-		}
-	}).json();
-
-	return results.map(result => result.text);
-};
 
 // This value was picked experimentally.
 // Substring search returns a lot of noise for shorter search words.
@@ -45,18 +33,4 @@ const getEmojilibEmojis = input => {
 	return emoji;
 };
 
-module.exports = async input => {
-	const set = new Set();
-
-	for (const emoji of getEmojilibEmojis(input)) {
-		set.add(emoji);
-	}
-
-	try {
-		for (const emoji of await getGetdangoEmojis(input)) {
-			set.add(emoji);
-		}
-	} catch {}
-
-	return [...set];
-};
+module.exports = getEmojilibEmojis;
