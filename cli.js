@@ -47,8 +47,7 @@ const cli = meow(`
 const config = new Conf({
 	projectName: 'emoj',
 	defaults: {
-		skinNumber: 0,
-		limit: 7
+		skinNumber: 0
 	}
 });
 
@@ -56,12 +55,8 @@ if (cli.flags.skinTone !== undefined) {
 	config.set('skinNumber', Math.max(0, Math.min(5, cli.flags.skinTone || 0)));
 }
 
-if (cli.flags.limit !== undefined) {
-	config.set('limit', Math.max(1, Math.min(100, cli.flags.limit || 0)));
-}
-
 const skinNumber = config.get('skinNumber');
-const limit = config.get('limit');
+const limit = Math.max(1, cli.flags.limit || 7);
 
 const main = async () => {
 	let app; // eslint-disable-line prefer-const
