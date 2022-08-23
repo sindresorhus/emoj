@@ -1,4 +1,3 @@
-'use strict';
 const React = require('react');
 const {useState, useCallback, useEffect} = require('react');
 const {Box, Text, useApp, useInput} = require('ink');
