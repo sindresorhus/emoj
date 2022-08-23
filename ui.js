@@ -26,9 +26,9 @@ const useDebouncedValue = (value, delay) => {
 
 // Limit it to 7 results so not to overwhelm the user
 // This also reduces the chance of showing unrelated emojis
-const fetch = mem(async string => {
+const fetch = mem(async (string, upperBound) => {
 	const array = await emoj(string);
-	return array.slice(0, 7);
+	return array.slice(0, upperBound);
 });
 
 const STAGE_CHECKING = 0;
@@ -77,7 +77,7 @@ const Search = ({query, emojis, skinNumber, selectedIndex, onChangeQuery}) => {
 	);
 };
 
-const Emoj = ({skinNumber: initialSkinNumber, onSelectEmoji}) => {
+const Emoj = ({skinNumber: initialSkinNumber, limit, onSelectEmoji}) => {
 	const {exit} = useApp();
 	const [stage, setStage] = useState(STAGE_CHECKING);
 	const [query, setQuery] = useState('');
@@ -112,7 +112,7 @@ const Emoj = ({skinNumber: initialSkinNumber, onSelectEmoji}) => {
 		let isCanceled = false;
 
 		const run = async () => {
-			const emojis = await fetch(debouncedQuery);
+			const emojis = await fetch(debouncedQuery, limit);
 
 			// Don't update state when this effect was canceled to avoid
 			// results that don't match the search query

@@ -22,6 +22,7 @@ const cli = meow(`
 	Options
 	  --copy -c       Copy the first emoji to the clipboard
 	  --skin-tone -s  Set and persist the default emoji skin tone (0 to 5)
+	  --limit -l      Maximum number of emojis to display (default: 7)
 
 	Run it without arguments to enter the live search
 	Use the up/down keys during live search to change the skin tone
@@ -35,6 +36,10 @@ const cli = meow(`
 		skinTone: {
 			type: 'number',
 			alias: 's'
+		},
+		limit: {
+			type: 'number',
+			alias: 'l'
 		}
 	}
 });
@@ -51,6 +56,7 @@ if (cli.flags.skinTone !== undefined) {
 }
 
 const skinNumber = config.get('skinNumber');
+const limit = Math.max(1, cli.flags.limit || 7);
 
 const main = async () => {
 	let app; // eslint-disable-line prefer-const
@@ -61,7 +67,7 @@ const main = async () => {
 	};
 
 	// Uses `React.createElement` instead of JSX to avoid transpiling this file.
-	app = render(React.createElement(ui, {skinNumber, onSelectEmoji}));
+	app = render(React.createElement(ui, {skinNumber, limit, onSelectEmoji}));
 
 	await app.waitUntilExit();
 };
@@ -69,7 +75,7 @@ const main = async () => {
 if (cli.input.length > 0) {
 	(async () => {
 		const emojis = (await emoj(cli.input[0]))
-			.slice(0, 7)
+			.slice(0, limit)
 			.map(emoji => skinTone(emoji, skinNumber));
 
 		console.log(emojis.join('  '));
