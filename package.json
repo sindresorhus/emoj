@@ -1,6 +1,6 @@
 {
 	"name": "emoj",
-	"version": "4.0.0",
+	"version": "4.0.1",
 	"description": "Find relevant emoji from text on the command-line",
 	"license": "MIT",
 	"repository": "sindresorhus/emoj",
