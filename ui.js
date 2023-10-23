@@ -1,10 +1,9 @@
-const React = require('react');
-const {useState, useCallback, useEffect} = require('react');
-const {Box, Text, useApp, useInput} = require('ink');
-const TextInput = require('ink-text-input').default;
-const skinTone = require('skin-tone');
-const mem = require('mem');
-const emoj = require('.');
+import React, {useState, useCallback, useEffect} from 'react';
+import {Box, Text, useApp, useInput} from 'ink';
+import TextInput from 'ink-text-input';
+import skinTone from 'skin-tone';
+import mem from 'mem';
+import emoj from './index.js';
 
 // From https://usehooks.com/useDebounce/
 const useDebouncedValue = (value, delay) => {
@@ -34,39 +33,52 @@ const STAGE_CHECKING = 0;
 const STAGE_SEARCH = 1;
 const STAGE_COPIED = 2;
 
-const QueryInput = ({query, placeholder, onChange}) => (
-	<Box>
-		<Text bold color="cyan">
-			›{' '}
+function QueryInput({query, placeholder, onChange}) {
+	return (
+		<Box>
+			<Text bold color='cyan'>
+				›{' '}
+			</Text>
+
+			<TextInput showCursor={false} value={query} placeholder={placeholder} onChange={onChange}/>
+		</Box>
+	);
+}
+
+function CopiedMessage({emoji}) {
+	return (
+		<Text color='green'>
+			{`${emoji} has been copied to the clipboard`}
 		</Text>
+	);
+}
 
-		<TextInput showCursor={false} value={query} placeholder={placeholder} onChange={onChange}/>
-	</Box>
-);
+const skinToneNames = [
+	'none',
+	'white',
+	'creamWhite',
+	'lightBrown',
+	'brown',
+	'darkBrown',
+];
 
-const CopiedMessage = ({emoji}) => (
-	<Text color="green">
-		{`${emoji} has been copied to the clipboard`}
-	</Text>
-);
-
-const Search = ({query, emojis, skinNumber, selectedIndex, onChangeQuery}) => {
+function Search({query, emojis, skinNumber, selectedIndex, onChangeQuery}) {
 	const list = emojis.map((emoji, index) => (
 		<Text
 			key={emoji}
 			backgroundColor={index === selectedIndex && 'gray'}
 		>
 			{' '}
-			{skinTone(emoji, skinNumber)}
+			{skinTone(emoji, skinToneNames[skinNumber])}
 			{' '}
 		</Text>
 	));
 
 	return (
-		<Box flexDirection="column" paddingTop={1} paddingBottom={emojis.length === 0 ? 2 : 0}>
+		<Box flexDirection='column' paddingTop={1} paddingBottom={emojis.length === 0 ? 2 : 0}>
 			<QueryInput
 				query={query}
-				placeholder="Relevant emojis will appear when you start writing"
+				placeholder='Relevant emojis will appear when you start writing'
 				onChange={onChangeQuery}
 			/>
 			<Box paddingTop={1}>
@@ -74,9 +86,9 @@ const Search = ({query, emojis, skinNumber, selectedIndex, onChangeQuery}) => {
 			</Box>
 		</Box>
 	);
-};
+}
 
-const Emoj = ({skinNumber: initialSkinNumber, limit, onSelectEmoji}) => {
+function Emoj({skinNumber: initialSkinNumber, limit, onSelectEmoji}) {
 	const {exit} = useApp();
 	const [stage, setStage] = useState(STAGE_CHECKING);
 	const [query, setQuery] = useState('');
@@ -135,7 +147,7 @@ const Emoj = ({skinNumber: initialSkinNumber, limit, onSelectEmoji}) => {
 
 		if (key.return) {
 			if (emojis.length > 0) {
-				setSelectedEmoji(skinTone(emojis[selectedIndex], skinNumber));
+				setSelectedEmoji(skinTone(emojis[selectedIndex], skinToneNames[skinNumber]));
 				setStage(STAGE_COPIED);
 			}
 
@@ -146,9 +158,9 @@ const Emoj = ({skinNumber: initialSkinNumber, limit, onSelectEmoji}) => {
 		// Catch all 10 keys, but handle only the same amount of keys
 		// as there are currently emojis
 		const numberKey = Number(input);
-		if (numberKey >= 0 && numberKey <= 9) {
+		if (input && numberKey >= 0 && numberKey <= 9) {
 			if (numberKey >= 1 && numberKey <= emojis.length) {
-				setSelectedEmoji(skinTone(emojis[numberKey - 1], skinNumber));
+				setSelectedEmoji(skinTone(emojis[numberKey - 1], skinToneNames[skinNumber]));
 				setStage(STAGE_COPIED);
 			}
 
@@ -202,6 +214,6 @@ const Emoj = ({skinNumber: initialSkinNumber, limit, onSelectEmoji}) => {
 			)}
 		</>
 	);
-};
+}
 
-module.exports = Emoj;
+export default Emoj;

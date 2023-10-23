@@ -1,15 +1,12 @@
-#!/usr/bin/env node
-'use strict';
-const meow = require('meow');
-const importJsx = require('import-jsx');
-const React = require('react');
-const {render} = require('ink');
-const clipboardy = require('clipboardy');
-const skinTone = require('skin-tone');
-const Conf = require('conf');
-const emoj = require('.');
-
-const ui = importJsx('./ui');
+#!/usr/bin/env NODE_NO_WARNINGS=1 node --loader=import-jsx
+import meow from 'meow';
+import React from 'react';
+import {render} from 'ink';
+import clipboardy from 'clipboardy';
+import skinTone from 'skin-tone';
+import Conf from 'conf';
+import ui from './ui.js';
+import emoj from './index.js';
 
 const cli = meow(`
 	Usage
@@ -28,37 +25,50 @@ const cli = meow(`
 	Use the up/down keys during live search to change the skin tone
 	Use the left/right or 1..9 keys during live search to select the emoji
 `, {
+	importMeta: import.meta,
 	flags: {
 		copy: {
 			type: 'boolean',
-			alias: 'c'
+			shortFlag: 'c',
 		},
 		skinTone: {
 			type: 'number',
-			alias: 's'
+			shortFlag: 's',
 		},
 		limit: {
 			type: 'number',
-			alias: 'l'
-		}
-	}
+			shortFlag: 'l',
+		},
+	},
 });
 
 const config = new Conf({
 	projectName: 'emoj',
 	defaults: {
-		skinNumber: 0
-	}
+		skinNumber: 0,
+	},
 });
 
 if (cli.flags.skinTone !== undefined) {
-	config.set('skinNumber', Math.max(0, Math.min(5, cli.flags.skinTone || 0)));
+	config.set('skinNumber', Math.max(0, Math.min(5, cli.flags.skinTone ?? 0)));
 }
 
 const skinNumber = config.get('skinNumber');
-const limit = Math.max(1, cli.flags.limit || 7);
+const limit = Math.max(1, cli.flags.limit ?? 7);
 
-const main = async () => {
+if (cli.input.length > 0) {
+	let emojis = await emoj(cli.input[0]);
+
+	emojis = emojis
+		.slice(0, limit)
+		.map(emoji => skinTone(emoji, skinNumber));
+
+	console.log(emojis.join('  '));
+
+	if (cli.flags.copy) {
+		clipboardy.writeSync(emojis[0]);
+	}
+} else {
 	let app; // eslint-disable-line prefer-const
 
 	const onSelectEmoji = emoji => {
@@ -70,20 +80,4 @@ const main = async () => {
 	app = render(React.createElement(ui, {skinNumber, limit, onSelectEmoji}));
 
 	await app.waitUntilExit();
-};
-
-if (cli.input.length > 0) {
-	(async () => {
-		const emojis = (await emoj(cli.input[0]))
-			.slice(0, limit)
-			.map(emoji => skinTone(emoji, skinNumber));
-
-		console.log(emojis.join('  '));
-
-		if (cli.flags.copy) {
-			clipboardy.writeSync(emojis[0]);
-		}
-	})();
-} else {
-	main();
 }

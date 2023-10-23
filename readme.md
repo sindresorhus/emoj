@@ -8,10 +8,10 @@ Uses a local emoji database.
 
 ## Install
 
-Ensure you have [Node.js](https://nodejs.org) version 10 or higher installed. Then run the following:
+Ensure you have [Node.js 18+](https://nodejs.org) installed, and then run the following:
 
-```
-$ npm install --global emoj
+```sh
+npm install --global emoj
 ```
 
 Works best on macOS and Linux. Older Linux distributions don't support color emoji in the terminal, but newer ones (like Ubuntu 18.04 and Fedora 28) do. On Linux, I would recommend installing [Emoji One](https://github.com/eosrei/emojione-color-font#install-on-linux) for full emoji coverage. [Doesn't really work on Windows.](https://github.com/sindresorhus/emoj/issues/5)

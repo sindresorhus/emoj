@@ -10,9 +10,10 @@
 		"email": "sindresorhus@gmail.com",
 		"url": "https://sindresorhus.com"
 	},
-	"bin": "cli.js",
+	"type": "module",
+	"bin": "./cli.js",
 	"engines": {
-		"node": ">=10"
+		"node": ">=18"
 	},
 	"scripts": {
 		"test": "xo && ava"
@@ -37,23 +38,24 @@
 		"networks"
 	],
 	"dependencies": {
-		"clipboardy": "^2.2.0",
-		"conf": "^7.1.1",
-		"emojilib": "^2.4.0",
-		"import-jsx": "^4.0.0",
-		"ink": "^3.0.3",
-		"ink-text-input": "^4.0.0",
-		"mem": "^6.0.1",
-		"meow": "^7.0.1",
-		"react": "^16.5.2",
-		"skin-tone": "^1.0.0"
+		"clipboardy": "^4.0.0",
+		"conf": "^11.0.2",
+		"emojilib": "^3.0.11",
+		"import-jsx": "^5.0.0",
+		"ink": "^4.4.1",
+		"ink-text-input": "^5.0.1",
+		"mem": "^9.0.2",
+		"meow": "^12.1.1",
+		"react": "^18.2.0",
+		"skin-tone": "^3.0.0",
+		"unicode-emoji-json": "^0.4.0"
 	},
 	"devDependencies": {
-		"ava": "^1.4.0",
-		"eslint-config-xo-react": "^0.23.0",
-		"eslint-plugin-react": "^7.20.5",
-		"eslint-plugin-react-hooks": "^4.0.8",
-		"xo": "^0.32.1"
+		"ava": "^5.3.1",
+		"eslint-config-xo-react": "^0.27.0",
+		"eslint-plugin-react": "^7.33.2",
+		"eslint-plugin-react-hooks": "^4.6.0",
+		"xo": "^0.56.0"
 	},
 	"xo": {
 		"extends": [

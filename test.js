@@ -1,12 +1,14 @@
 import test from 'ava';
-import emoj from '.';
+import emoj from './index.js';
 
 test('main', async t => {
 	const [unicornEmoji] = await emoj('unicorn');
 	t.is(unicornEmoji, '🦄');
 });
 
-test('local db emojis', async t => {
-	t.true((await emoj('crossed')).includes('🤞'));
-	t.true((await emoj('drool')).includes('🤤'));
+test('local database emojis', async t => {
+	const result1 = await emoj('crossed');
+	const result2 = await emoj('drool');
+	t.true(result1.includes('🤞'));
+	t.true(result2.includes('🤤'));
 });
