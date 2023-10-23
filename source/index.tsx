@@ -12,8 +12,9 @@ const unicodeEmojiJson = require('unicode-emoji-json');
 // Substring search returns a lot of noise for shorter search words.
 const MIN_WORD_LENGTH_FOR_SUBSTRING_SEARCH = 4;
 
-export default function getEmojilibEmojis(input) {
-	const regexSource = input.toLowerCase().split(/\s/g)
+// We keep this async in case we need to to become async in the future
+export default async function getEmojilibEmojis(searchQuery: string): Promise<string[]> {
+	const regexSource = searchQuery.toLowerCase().split(/\s/g)
 		.map(v => v.replaceAll(/\W/g, ''))
 		.filter(v => v.length > 0)
 		.map(v => v.length < MIN_WORD_LENGTH_FOR_SUBSTRING_SEARCH ? `^${v}$` : v)
@@ -24,7 +25,7 @@ export default function getEmojilibEmojis(input) {
 	}
 
 	const regex = new RegExp(regexSource);
-	const emojis = [];
+	const emojis: string[] = [];
 
 	for (const emojiCharacter of Object.keys(unicodeEmojiJson)) {
 		const emojiData = unicodeEmojiJson[emojiCharacter];

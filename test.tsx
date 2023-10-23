@@ -1,5 +1,5 @@
 import test from 'ava';
-import emoj from './index.js';
+import emoj from './source/index.js';
 
 test('main', async t => {
 	const [unicornEmoji] = await emoj('unicorn');

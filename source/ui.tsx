@@ -6,7 +6,7 @@ import mem from 'mem';
 import emoj from './index.js';
 
 // From https://usehooks.com/useDebounce/
-const useDebouncedValue = (value, delay) => {
+const useDebouncedValue = <T,>(value: T, delay: number): T => { // eslint-disable-line @typescript-eslint/comma-dangle
 	const [debouncedValue, setDebouncedValue] = useState(value);
 
 	useEffect(() => {
@@ -60,7 +60,7 @@ const skinToneNames = [
 	'lightBrown',
 	'brown',
 	'darkBrown',
-];
+] as const;
 
 function Search({query, emojis, skinNumber, selectedIndex, onChangeQuery}) {
 	const list = emojis.map((emoji, index) => (
@@ -69,7 +69,7 @@ function Search({query, emojis, skinNumber, selectedIndex, onChangeQuery}) {
 			backgroundColor={index === selectedIndex && 'gray'}
 		>
 			{' '}
-			{skinTone(emoji, skinToneNames[skinNumber])}
+			{skinTone(emoji, skinToneNames[skinNumber]!)}
 			{' '}
 		</Text>
 	));
@@ -95,7 +95,7 @@ function Emoj({skinNumber: initialSkinNumber, limit, onSelectEmoji}) {
 	const [emojis, setEmojis] = useState([]);
 	const [skinNumber, setSkinNumber] = useState(initialSkinNumber);
 	const [selectedIndex, setSelectedIndex] = useState(0);
-	const [selectedEmoji, setSelectedEmoji] = useState();
+	const [selectedEmoji, setSelectedEmoji] = useState<string>();
 
 	useEffect(() => {
 		if (selectedEmoji && stage === STAGE_COPIED) {
@@ -107,7 +107,7 @@ function Emoj({skinNumber: initialSkinNumber, limit, onSelectEmoji}) {
 		setSelectedIndex(0);
 		setEmojis([]);
 		setQuery(query);
-	});
+	}, []);
 
 	useEffect(() => {
 		setStage(STAGE_SEARCH);
@@ -117,7 +117,7 @@ function Emoj({skinNumber: initialSkinNumber, limit, onSelectEmoji}) {
 
 	useEffect(() => {
 		if (debouncedQuery.length <= 1) {
-			return;
+			return undefined;
 		}
 
 		let isCanceled = false;
@@ -132,7 +132,7 @@ function Emoj({skinNumber: initialSkinNumber, limit, onSelectEmoji}) {
 			}
 		};
 
-		run();
+		run(); // eslint-disable-line @typescript-eslint/no-floating-promises
 
 		return () => {
 			isCanceled = true;
@@ -147,7 +147,7 @@ function Emoj({skinNumber: initialSkinNumber, limit, onSelectEmoji}) {
 
 		if (key.return) {
 			if (emojis.length > 0) {
-				setSelectedEmoji(skinTone(emojis[selectedIndex], skinToneNames[skinNumber]));
+				setSelectedEmoji(skinTone(emojis[selectedIndex], skinToneNames[skinNumber]!));
 				setStage(STAGE_COPIED);
 			}
 
@@ -160,7 +160,7 @@ function Emoj({skinNumber: initialSkinNumber, limit, onSelectEmoji}) {
 		const numberKey = Number(input);
 		if (input && numberKey >= 0 && numberKey <= 9) {
 			if (numberKey >= 1 && numberKey <= emojis.length) {
-				setSelectedEmoji(skinTone(emojis[numberKey - 1], skinToneNames[skinNumber]));
+				setSelectedEmoji(skinTone(emojis[numberKey - 1], skinToneNames[skinNumber]!));
 				setStage(STAGE_COPIED);
 			}
 
@@ -176,7 +176,7 @@ function Emoj({skinNumber: initialSkinNumber, limit, onSelectEmoji}) {
 		}
 
 		if (key.upArrow && skinNumber < 5) {
-			setSkinNumber(skinNumber + 1);
+			setSkinNumber(skinNumber + 1); // eslint-disable-line @typescript-eslint/restrict-plus-operands
 		}
 
 		if (key.downArrow && skinNumber > 0) {

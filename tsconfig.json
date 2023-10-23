@@ -1,0 +1,14 @@
+{
+	"extends": "@sindresorhus/tsconfig",
+	"compilerOptions": {
+		"outDir": "distribution",
+		"strict": false
+	},
+	"include": [
+		"source"
+	],
+	"ts-node": {
+		"transpileOnly": true,
+		"files": true
+	}
+}

@@ -11,17 +11,18 @@
 		"url": "https://sindresorhus.com"
 	},
 	"type": "module",
-	"bin": "./cli.js",
+	"bin": "./distribution/cli.js",
 	"engines": {
 		"node": ">=18"
 	},
 	"scripts": {
+		"build": "tsc",
+		"prepublish": "npm run build",
+		"pretest": "npm run build",
 		"test": "xo && ava"
 	},
 	"files": [
-		"cli.js",
-		"index.js",
-		"ui.js"
+		"distribution"
 	],
 	"keywords": [
 		"cli-app",
@@ -38,10 +39,10 @@
 		"networks"
 	],
 	"dependencies": {
+		"@types/react": "^18.2.31",
 		"clipboardy": "^4.0.0",
 		"conf": "^11.0.2",
 		"emojilib": "^3.0.11",
-		"import-jsx": "^5.0.0",
 		"ink": "^4.4.1",
 		"ink-text-input": "^5.0.1",
 		"mem": "^9.0.2",
@@ -51,10 +52,13 @@
 		"unicode-emoji-json": "^0.4.0"
 	},
 	"devDependencies": {
+		"@sindresorhus/tsconfig": "^5.0.0",
 		"ava": "^5.3.1",
 		"eslint-config-xo-react": "^0.27.0",
 		"eslint-plugin-react": "^7.33.2",
 		"eslint-plugin-react-hooks": "^4.6.0",
+		"ts-node": "^10.9.1",
+		"typescript": "^5.2.2",
 		"xo": "^0.56.0"
 	},
 	"xo": {
@@ -63,7 +67,21 @@
 		],
 		"rules": {
 			"react/prop-types": "off",
-			"react/state-in-constructor": "off"
+			"react/state-in-constructor": "off",
+			"@typescript-eslint/prefer-nullish-coalescing": "off",
+			"@typescript-eslint/no-unsafe-assignment": "off",
+			"@typescript-eslint/no-unsafe-call": "off",
+			"@typescript-eslint/no-unsafe-argument": "off",
+			"@typescript-eslint/naming-convention": "off"
 		}
+	},
+	"ava": {
+		"extensions": {
+			"ts": "module",
+			"tsx": "module"
+		},
+		"nodeArguments": [
+			"--loader=ts-node/esm"
+		]
 	}
 }
