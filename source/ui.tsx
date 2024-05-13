@@ -1,5 +1,10 @@
 import React, {useState, useCallback, useEffect} from 'react';
-import {Box, Text, useApp, useInput} from 'ink';
+import {
+	Box,
+	Text,
+	useApp,
+	useInput,
+} from 'ink';
 import TextInput from 'ink-text-input';
 import skinTone from 'skin-tone';
 import mem from 'mem';
@@ -64,14 +69,13 @@ const skinToneNames = [
 
 function Search({query, emojis, skinNumber, selectedIndex, onChangeQuery}) {
 	const list = emojis.map((emoji, index) => (
-		<Text
-			key={emoji}
-			backgroundColor={index === selectedIndex && 'gray'}
-		>
-			{' '}
-			{skinTone(emoji, skinToneNames[skinNumber]!)}
-			{' '}
-		</Text>
+		<Box key={emoji}>
+			<Text backgroundColor={index === selectedIndex && 'gray'}>
+				{' '}
+				{skinTone(emoji, skinToneNames[skinNumber])}
+				{' '}
+			</Text>
+		</Box>
 	));
 
 	return (
@@ -147,7 +151,7 @@ function Emoj({skinNumber: initialSkinNumber, limit, onSelectEmoji}) {
 
 		if (key.return) {
 			if (emojis.length > 0) {
-				setSelectedEmoji(skinTone(emojis[selectedIndex], skinToneNames[skinNumber]!));
+				setSelectedEmoji(skinTone(emojis[selectedIndex], skinToneNames[skinNumber]));
 				setStage(STAGE_COPIED);
 			}
 
@@ -160,7 +164,7 @@ function Emoj({skinNumber: initialSkinNumber, limit, onSelectEmoji}) {
 		const numberKey = Number(input);
 		if (input && numberKey >= 0 && numberKey <= 9) {
 			if (numberKey >= 1 && numberKey <= emojis.length) {
-				setSelectedEmoji(skinTone(emojis[numberKey - 1], skinToneNames[skinNumber]!));
+				setSelectedEmoji(skinTone(emojis[numberKey - 1], skinToneNames[skinNumber]));
 				setStage(STAGE_COPIED);
 			}
 
@@ -176,7 +180,7 @@ function Emoj({skinNumber: initialSkinNumber, limit, onSelectEmoji}) {
 		}
 
 		if (key.upArrow && skinNumber < 5) {
-			setSkinNumber(skinNumber + 1); // eslint-disable-line @typescript-eslint/restrict-plus-operands
+			setSkinNumber(skinNumber + 1);
 		}
 
 		if (key.downArrow && skinNumber > 0) {

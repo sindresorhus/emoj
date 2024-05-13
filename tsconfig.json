@@ -2,13 +2,10 @@
 	"extends": "@sindresorhus/tsconfig",
 	"compilerOptions": {
 		"outDir": "distribution",
-		"strict": false
+		"strict": false,
+		"jsx": "react"
 	},
 	"include": [
 		"source"
-	],
-	"ts-node": {
-		"transpileOnly": true,
-		"files": true
-	}
+	]
 }

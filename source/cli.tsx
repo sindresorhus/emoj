@@ -67,16 +67,16 @@ const skinToneNames = [
 ] as const;
 
 if (cli.input.length > 0) {
-	let emojis = await emoj(cli.input[0]!);
+	let emojis = await emoj(cli.input[0]);
 
 	emojis = emojis
 		.slice(0, limit)
-		.map(emoji => skinTone(emoji, skinToneNames[skinNumber]!));
+		.map(emoji => skinTone(emoji, skinToneNames[skinNumber]));
 
 	console.log(emojis.join('  '));
 
 	if (cli.flags.copy) {
-		clipboardy.writeSync(emojis[0]!);
+		clipboardy.writeSync(emojis[0]);
 	}
 } else {
 	let app: any; // eslint-disable-line prefer-const
