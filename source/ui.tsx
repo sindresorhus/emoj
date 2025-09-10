@@ -6,7 +6,7 @@ import {
 	useInput,
 } from 'ink';
 import TextInput from 'ink-text-input';
-import skinTone from 'skin-tone';
+import skinTone, {type SkinToneType} from 'skin-tone';
 import mem from 'mem';
 import emoj from './index.js';
 
@@ -29,16 +29,22 @@ const useDebouncedValue = <T,>(value: T, delay: number): T => { // eslint-disabl
 
 // Limit it to 7 results so not to overwhelm the user
 // This also reduces the chance of showing unrelated emojis
-const fetch = mem(async (string, upperBound) => {
+const fetch = mem(async (string: string, upperBound: number) => {
 	const array = await emoj(string);
 	return array.slice(0, upperBound);
 });
 
-const STAGE_CHECKING = 0;
-const STAGE_SEARCH = 1;
-const STAGE_COPIED = 2;
+const stageChecking = 0;
+const stageSearch = 1;
+const stageCopied = 2;
 
-function QueryInput({query, placeholder, onChange}) {
+type QueryInputProperties = {
+	readonly query: string;
+	readonly placeholder: string;
+	readonly onChange: (value: string) => void;
+};
+
+function QueryInput({query, placeholder, onChange}: QueryInputProperties) {
 	return (
 		<Box>
 			<Text bold color='cyan'>
@@ -50,7 +56,11 @@ function QueryInput({query, placeholder, onChange}) {
 	);
 }
 
-function CopiedMessage({emoji}) {
+type CopiedMessageProperties = {
+	readonly emoji: string | undefined;
+};
+
+function CopiedMessage({emoji}: CopiedMessageProperties) {
 	return (
 		<Text color='green'>
 			{`${emoji} has been copied to the clipboard`}
@@ -58,21 +68,29 @@ function CopiedMessage({emoji}) {
 	);
 }
 
-const skinToneNames = [
+const skinToneNames: SkinToneType[] = [
 	'none',
 	'white',
 	'creamWhite',
 	'lightBrown',
 	'brown',
 	'darkBrown',
-] as const;
+];
 
-function Search({query, emojis, skinNumber, selectedIndex, onChangeQuery}) {
-	const list = emojis.map((emoji, index) => (
+type SearchProperties = {
+	readonly query: string;
+	readonly emojis: string[];
+	readonly skinNumber: number;
+	readonly selectedIndex: number;
+	readonly onChangeQuery: (value: string) => void;
+};
+
+function Search({query, emojis, skinNumber, selectedIndex, onChangeQuery}: SearchProperties) {
+	const list = emojis.map((emoji: string, index: number) => (
 		<Box key={emoji}>
-			<Text backgroundColor={index === selectedIndex && 'gray'}>
+			<Text backgroundColor={index === selectedIndex ? 'gray' : undefined}>
 				{' '}
-				{skinTone(emoji, skinToneNames[skinNumber])}
+				{skinTone(emoji, skinToneNames[skinNumber]!)}
 				{' '}
 			</Text>
 		</Box>
@@ -92,29 +110,35 @@ function Search({query, emojis, skinNumber, selectedIndex, onChangeQuery}) {
 	);
 }
 
-function Emoj({skinNumber: initialSkinNumber, limit, onSelectEmoji}) {
+type EmojProperties = {
+	readonly skinNumber: number;
+	readonly limit: number;
+	readonly onSelectEmoji: (emoji: string) => void;
+};
+
+function Emoj({skinNumber: initialSkinNumber, limit, onSelectEmoji}: EmojProperties) {
 	const {exit} = useApp();
-	const [stage, setStage] = useState(STAGE_CHECKING);
+	const [stage, setStage] = useState(stageChecking);
 	const [query, setQuery] = useState('');
-	const [emojis, setEmojis] = useState([]);
+	const [emojis, setEmojis] = useState<string[]>([]);
 	const [skinNumber, setSkinNumber] = useState(initialSkinNumber);
 	const [selectedIndex, setSelectedIndex] = useState(0);
 	const [selectedEmoji, setSelectedEmoji] = useState<string>();
 
 	useEffect(() => {
-		if (selectedEmoji && stage === STAGE_COPIED) {
+		if (selectedEmoji && stage === stageCopied) {
 			onSelectEmoji(selectedEmoji);
 		}
 	}, [selectedEmoji, stage, onSelectEmoji]);
 
-	const changeQuery = useCallback(query => {
+	const changeQuery = useCallback((query: string) => {
 		setSelectedIndex(0);
 		setEmojis([]);
 		setQuery(query);
 	}, []);
 
 	useEffect(() => {
-		setStage(STAGE_SEARCH);
+		setStage(stageSearch);
 	}, []);
 
 	const debouncedQuery = useDebouncedValue(query, 200);
@@ -141,7 +165,31 @@ function Emoj({skinNumber: initialSkinNumber, limit, onSelectEmoji}) {
 		return () => {
 			isCanceled = true;
 		};
-	}, [debouncedQuery]);
+	}, [debouncedQuery, limit]);
+
+	const selectEmoji = useCallback((emojiIndex: number) => {
+		const emoji = emojis[emojiIndex];
+		if (emoji) {
+			setSelectedEmoji(skinTone(emoji, skinToneNames[skinNumber]!));
+			setStage(stageCopied);
+		}
+	}, [emojis, skinNumber]);
+
+	const handleSkinToneChange = useCallback((direction: 'up' | 'down') => {
+		if (direction === 'up' && skinNumber < 5) {
+			setSkinNumber(skinNumber + 1);
+		} else if (direction === 'down' && skinNumber > 0) {
+			setSkinNumber(skinNumber - 1);
+		}
+	}, [skinNumber]);
+
+	const handleIndexChange = useCallback((direction: 'left' | 'right') => {
+		if (direction === 'right') {
+			setSelectedIndex(selectedIndex < emojis.length - 1 ? selectedIndex + 1 : 0);
+		} else {
+			setSelectedIndex(selectedIndex > 0 ? selectedIndex - 1 : emojis.length - 1);
+		}
+	}, [selectedIndex, emojis.length]);
 
 	useInput((input, key) => {
 		if (key.escape || (key.ctrl && input === 'c')) {
@@ -149,65 +197,36 @@ function Emoj({skinNumber: initialSkinNumber, limit, onSelectEmoji}) {
 			return;
 		}
 
-		if (key.return) {
-			if (emojis.length > 0) {
-				setSelectedEmoji(skinTone(emojis[selectedIndex], skinToneNames[skinNumber]));
-				setStage(STAGE_COPIED);
-			}
-
+		if (key.return && emojis.length > 0) {
+			selectEmoji(selectedIndex);
 			return;
 		}
 
-		// Select emoji by typing a number
-		// Catch all 10 keys, but handle only the same amount of keys
-		// as there are currently emojis
 		const numberKey = Number(input);
-		if (input && numberKey >= 0 && numberKey <= 9) {
-			if (numberKey >= 1 && numberKey <= emojis.length) {
-				setSelectedEmoji(skinTone(emojis[numberKey - 1], skinToneNames[skinNumber]));
-				setStage(STAGE_COPIED);
-			}
-
+		if (input && numberKey >= 1 && numberKey <= emojis.length) {
+			selectEmoji(numberKey - 1);
 			return;
 		}
 
-		// Filter out all ansi sequences except the up/down keys which change the skin tone
-		// and left/right keys which select emoji inside a list
-		const isArrowKey = key.upArrow || key.downArrow || key.leftArrow || key.rightArrow;
-
-		if (!isArrowKey || query.length <= 1) {
+		if (query.length <= 1) {
 			return;
 		}
 
-		if (key.upArrow && skinNumber < 5) {
-			setSkinNumber(skinNumber + 1);
-		}
-
-		if (key.downArrow && skinNumber > 0) {
-			setSkinNumber(skinNumber - 1);
-		}
-
-		if (key.rightArrow) {
-			if (selectedIndex < emojis.length - 1) {
-				setSelectedIndex(selectedIndex + 1);
-			} else {
-				setSelectedIndex(0);
-			}
-		}
-
-		if (key.leftArrow) {
-			if (selectedIndex > 0) {
-				setSelectedIndex(selectedIndex - 1);
-			} else {
-				setSelectedIndex(emojis.length - 1);
-			}
+		if (key.upArrow) {
+			handleSkinToneChange('up');
+		} else if (key.downArrow) {
+			handleSkinToneChange('down');
+		} else if (key.rightArrow) {
+			handleIndexChange('right');
+		} else if (key.leftArrow) {
+			handleIndexChange('left');
 		}
 	});
 
 	return (
 		<>
-			{stage === STAGE_COPIED && <CopiedMessage emoji={selectedEmoji}/>}
-			{stage === STAGE_SEARCH && (
+			{stage === stageCopied && <CopiedMessage emoji={selectedEmoji}/>}
+			{stage === stageSearch && (
 				<Search
 					query={query}
 					emojis={emojis}

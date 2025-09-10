@@ -3,7 +3,7 @@ import meow from 'meow';
 import React from 'react';
 import {render} from 'ink';
 import clipboardy from 'clipboardy';
-import skinTone from 'skin-tone';
+import skinTone, {type SkinToneType} from 'skin-tone';
 import Conf from 'conf';
 import ui from './ui.js';
 import emoj from './index.js';
@@ -56,32 +56,31 @@ if (cli.flags.skinTone !== undefined) {
 const skinNumber = config.get('skinNumber');
 const limit = Math.max(1, cli.flags.limit ?? 7);
 
-// TODO: skin-tone package should export this.
-const skinToneNames = [
+const skinToneNames: SkinToneType[] = [
 	'none',
 	'white',
 	'creamWhite',
 	'lightBrown',
 	'brown',
 	'darkBrown',
-] as const;
+];
 
-if (cli.input.length > 0) {
+if (cli.input.length > 0 && cli.input[0]) {
 	let emojis = await emoj(cli.input[0]);
 
 	emojis = emojis
 		.slice(0, limit)
-		.map(emoji => skinTone(emoji, skinToneNames[skinNumber]));
+		.map(emoji => skinTone(emoji, skinToneNames[skinNumber]!));
 
 	console.log(emojis.join('  '));
 
-	if (cli.flags.copy) {
+	if (cli.flags.copy && emojis[0]) {
 		clipboardy.writeSync(emojis[0]);
 	}
 } else {
-	let app: any; // eslint-disable-line prefer-const
+	let app: ReturnType<typeof render>; // eslint-disable-line prefer-const
 
-	const onSelectEmoji = emoji => {
+	const onSelectEmoji = (emoji: string) => {
 		clipboardy.writeSync(emoji);
 		app.unmount();
 	};

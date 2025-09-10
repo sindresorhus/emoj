@@ -52,6 +52,7 @@
 	},
 	"devDependencies": {
 		"@sindresorhus/tsconfig": "^5.0.0",
+		"@types/react": "^19.1.12",
 		"ava": "^6.1.3",
 		"eslint-config-xo-react": "^0.27.0",
 		"eslint-plugin-react": "^7.34.1",
@@ -66,14 +67,7 @@
 		],
 		"rules": {
 			"react/prop-types": "off",
-			"react/state-in-constructor": "off",
-			"@typescript-eslint/prefer-nullish-coalescing": "off",
-			"@typescript-eslint/no-unsafe-assignment": "off",
-			"@typescript-eslint/no-unsafe-call": "off",
-			"@typescript-eslint/no-unsafe-argument": "off",
-			"@typescript-eslint/naming-convention": "off",
-			"@typescript-eslint/no-unsafe-return": "off",
-			"@typescript-eslint/restrict-plus-operands": "off"
+			"react/state-in-constructor": "off"
 		}
 	},
 	"ava": {
