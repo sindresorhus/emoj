@@ -24,6 +24,7 @@ const cli = meow(`
 	Run it without arguments to enter the live search
 	Use the up/down keys during live search to change the skin tone
 	Use the left/right or 1..9 keys during live search to select the emoji
+	Press Tab to copy emoji and continue searching (Enter/1-9 to exit)
 `, {
 	importMeta: import.meta,
 	flags: {

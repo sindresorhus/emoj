@@ -6,6 +6,7 @@ import {
 	useInput,
 } from 'ink';
 import TextInput from 'ink-text-input';
+import clipboardy from 'clipboardy';
 import skinTone, {type SkinToneType} from 'skin-tone';
 import mem from 'mem';
 import emoj from './index.js';
@@ -82,10 +83,11 @@ type SearchProperties = {
 	readonly emojis: string[];
 	readonly skinNumber: number;
 	readonly selectedIndex: number;
+	readonly isCopiedIndicatorVisible: boolean;
 	readonly onChangeQuery: (value: string) => void;
 };
 
-function Search({query, emojis, skinNumber, selectedIndex, onChangeQuery}: SearchProperties) {
+function Search({query, emojis, skinNumber, selectedIndex, isCopiedIndicatorVisible, onChangeQuery}: SearchProperties) {
 	const list = emojis.map((emoji: string, index: number) => (
 		<Box key={emoji}>
 			<Text backgroundColor={index === selectedIndex ? 'gray' : undefined}>
@@ -105,6 +107,9 @@ function Search({query, emojis, skinNumber, selectedIndex, onChangeQuery}: Searc
 			/>
 			<Box paddingTop={1}>
 				{list}
+				{isCopiedIndicatorVisible && (
+					<Text color='green'>  ✓</Text>
+				)}
 			</Box>
 		</Box>
 	);
@@ -124,6 +129,7 @@ function Emoj({skinNumber: initialSkinNumber, limit, onSelectEmoji}: EmojPropert
 	const [skinNumber, setSkinNumber] = useState(initialSkinNumber);
 	const [selectedIndex, setSelectedIndex] = useState(0);
 	const [selectedEmoji, setSelectedEmoji] = useState<string>();
+	const [isCopiedIndicatorVisible, setIsCopiedIndicatorVisible] = useState(false);
 
 	useEffect(() => {
 		if (selectedEmoji && stage === stageCopied) {
@@ -167,11 +173,21 @@ function Emoj({skinNumber: initialSkinNumber, limit, onSelectEmoji}: EmojPropert
 		};
 	}, [debouncedQuery, limit]);
 
-	const selectEmoji = useCallback((emojiIndex: number) => {
+	const copyEmoji = useCallback((emojiIndex: number, shouldExit = true) => {
 		const emoji = emojis[emojiIndex];
 		if (emoji) {
-			setSelectedEmoji(skinTone(emoji, skinToneNames[skinNumber]!));
-			setStage(stageCopied);
+			const styledEmoji = skinTone(emoji, skinToneNames[skinNumber]!);
+			if (shouldExit) {
+				setSelectedEmoji(styledEmoji);
+				setStage(stageCopied);
+			} else {
+				// Copy and continue
+				clipboardy.writeSync(styledEmoji);
+				setIsCopiedIndicatorVisible(true);
+				setTimeout(() => {
+					setIsCopiedIndicatorVisible(false);
+				}, 1500);
+			}
 		}
 	}, [emojis, skinNumber]);
 
@@ -197,14 +213,22 @@ function Emoj({skinNumber: initialSkinNumber, limit, onSelectEmoji}: EmojPropert
 			return;
 		}
 
-		if (key.return && emojis.length > 0) {
-			selectEmoji(selectedIndex);
+		// Tab key: Copy and continue
+		if (key.tab && emojis.length > 0) {
+			copyEmoji(selectedIndex, false);
 			return;
 		}
 
+		// Enter: Copy and exit
+		if (key.return && emojis.length > 0) {
+			copyEmoji(selectedIndex);
+			return;
+		}
+
+		// Number keys: Copy and exit
 		const numberKey = Number(input);
 		if (input && numberKey >= 1 && numberKey <= emojis.length) {
-			selectEmoji(numberKey - 1);
+			copyEmoji(numberKey - 1);
 			return;
 		}
 
@@ -232,6 +256,7 @@ function Emoj({skinNumber: initialSkinNumber, limit, onSelectEmoji}: EmojPropert
 					emojis={emojis}
 					skinNumber={skinNumber}
 					selectedIndex={selectedIndex}
+					isCopiedIndicatorVisible={isCopiedIndicatorVisible}
 					onChangeQuery={changeQuery}
 				/>
 			)}
