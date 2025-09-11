@@ -25,7 +25,7 @@ $ emoj --help
     $ emoj [text]
 
   Example
-    $ emoj 'i love unicorns'
+    $ emoj i love unicorns
     🦄  🎠  🐴  🐎  ❤  ✨  🌈
 
   Options

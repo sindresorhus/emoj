@@ -67,7 +67,8 @@
 		],
 		"rules": {
 			"react/prop-types": "off",
-			"react/state-in-constructor": "off"
+			"react/state-in-constructor": "off",
+			"@typescript-eslint/indent": "off"
 		}
 	},
 	"ava": {

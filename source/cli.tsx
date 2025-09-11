@@ -13,7 +13,7 @@ const cli = meow(`
 	  $ emoj [text]
 
 	Example
-	  $ emoj 'i love unicorns'
+	  $ emoj i love unicorns
 	  🦄  🎠  🐴  🐎  ❤  ✨  🌈
 
 	Options
@@ -66,8 +66,9 @@ const skinToneNames: SkinToneType[] = [
 	'darkBrown',
 ];
 
-if (cli.input.length > 0 && cli.input[0]) {
-	let emojis = await emoj(cli.input[0]);
+if (cli.input.length > 0) {
+	const searchQuery = cli.input.join(' ');
+	let emojis = await emoj(searchQuery);
 
 	emojis = emojis
 		.slice(0, limit)
