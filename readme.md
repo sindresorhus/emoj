@@ -21,6 +21,8 @@ Works best on macOS and Linux. Older Linux distributions don't support color emo
 ```
 $ emoj --help
 
+  Find relevant emoji from text on the command-line
+
   Usage
     $ emoj [text]
 
@@ -31,6 +33,7 @@ $ emoj --help
   Options
     --copy -c       Copy the first emoji to the clipboard
     --skin-tone -s  Set and persist the default emoji skin tone (0 to 5)
+    --limit -l      Maximum number of emojis to display (default: 7)
 
   Run it without arguments to enter the live search
   Use the up/down keys during live search to change the skin tone
