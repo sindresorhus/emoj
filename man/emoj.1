@@ -1,0 +1,72 @@
+.TH EMOJ 1 "March 2026" "emoj 4.2.0" "User Commands"
+.SH NAME
+emoj \- Find relevant emoji from text on the command-line
+.SH SYNOPSIS
+.B emoj
+[\fIoptions\fR]
+[\fItext\fR]
+.SH DESCRIPTION
+\fBemoj\fR is a command-line utility to search for emojis based on keywords or text.
+It uses local emoji databases (\fBemojilib\fR and \fBunicode-emoji-json\fR) to match search terms against emoji names and keywords.
+
+When run with \fItext\fR, it performs a direct search and prints the results.
+When run without arguments, it enters an interactive \fBLive Search\fR mode.
+
+.SH OPTIONS
+.TP
+.BR \-c ", " \-\-copy
+Copy the first emoji from the search results to the system clipboard.
+.TP
+.BR \-s ", " \-\-skin\-tone " \fI0-5\fR"
+Set and persist the default emoji skin tone. 
+0: None, 1: White, 2: Cream White, 3: Light Brown, 4: Brown, 5: Dark Brown.
+.TP
+.BR \-l ", " \-\-limit " \fInumber\fR"
+Maximum number of emojis to display (default: 7).
+
+.SH INTERACTIVE CONTROLS
+When in \fBLive Search\fR mode (run without arguments):
+.TP
+.B Up/Down Arrow Keys
+Change the skin tone (0-5).
+.TP
+.B Left/Right Arrow Keys
+Navigate through the results.
+.TP
+.B 1..9 Keys
+Directly select and copy an emoji (exits the app).
+.TP
+.B Tab Key
+Copy the selected emoji and continue searching.
+.TP
+.B Enter Key
+Copy the selected emoji and exit.
+.TP
+.B Escape / Ctrl+C
+Exit the application.
+
+.SH ENVIRONMENT
+.TP
+.B COLORTERM
+Set to \fBtruecolor\fR to enable 24-bit color support in compatible terminals.
+.TP
+.B FORCE_COLOR
+Force color output. Use \fB1\fR, \fB2\fR, or \fB3\fR to set color depth.
+.TP
+.B NO_COLOR
+If set, disables all color output.
+.TP
+.B TERM
+Standard terminal type variable used for feature detection.
+
+.SH FILES
+.TP
+.I ~/.config/emoj-nodejs/config.json
+The configuration file where user preferences, such as the persistent skin tone, are stored. 
+This path may vary depending on the environment and is managed by the \fBconf\fR package.
+
+.SH BUGS
+See \fBhttps://github.com/sindresorhus/emoj/issues\fR
+
+.SH AUTHOR
+Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)

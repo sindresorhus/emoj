@@ -12,6 +12,9 @@
 	},
 	"type": "module",
 	"bin": "./distribution/cli.js",
+	"man": [
+		"./man/emoj.1"
+	],
 	"engines": {
 		"node": ">=18"
 	},
@@ -22,7 +25,8 @@
 		"test": "xo && ava"
 	},
 	"files": [
-		"distribution"
+		"distribution",
+		"man"
 	],
 	"keywords": [
 		"cli-app",
